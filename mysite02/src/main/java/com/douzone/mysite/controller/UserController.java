@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.douzone.mysite.mvc.UserActionFactory;
+import com.douzone.mysite.mvc.user.UserActionFactory;
 import com.douzone.web.mvc.Action;
 import com.douzone.web.mvc.ActionFactory;
 
