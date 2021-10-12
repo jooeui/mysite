@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.douzone.mysite.dao.UserDao;
 import com.douzone.mysite.vo.UserVo;
@@ -27,7 +28,9 @@ public class LoginAction implements Action {
 		}
 		
 		/* 인증처리(세션처리) */
-		System.out.println("인증처리(세션처리)");
+		HttpSession session = request.getSession(true);	// default = null
+		session.setAttribute("authUser", userVo);
+		
 		MvcUtils.redirect("/mysite02", request, response);
 	}
 
