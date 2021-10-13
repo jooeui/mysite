@@ -1,23 +1,21 @@
-<%@page import="java.util.List"%>
-<%@page import="com.douzone.mysite.vo.GuestbookVo"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%
-	List<GuestbookVo> gbList = (List<GuestbookVo>)request.getAttribute("gbList");
-	int index = gbList.size();
-%>
+<% pageContext.setAttribute("newline", "\n");	// jstl에서 \n을 쓸 수 없기 때문에 이렇게 사용 %>
 <!DOCTYPE html>
 <html>
 <head>
 <title>mysite</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<link href="<%=request.getContextPath() %>/assets/css/guestbook.css" rel="stylesheet" type="text/css">
+<link href="${pageContext.request.contextPath }/assets/css/guestbook.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 	<div id="container">
-		<jsp:include page="/WEB-INF/views/includes/header.jsp" />
+		<c:import url="/WEB-INF/views/includes/header.jsp" />
 		<div id="content">
 			<div id="guestbook">
-				<form action="<%=request.getContextPath() %>/guestbook" method="post">
+				<form action="${pageContext.request.contextPath }/guestbook" method="post">
 					<input type="hidden" name="a" value="insert">
 					<table>
 						<tr>
@@ -33,29 +31,30 @@
 					</table>
 				</form>
 				<ul>
-					<li>
-					<%
-						for(GuestbookVo vo : gbList){
-					%>
-						<table>
-							<tr>
-								<td>[<%=index-- %>]</td>
-								<td><%=vo.getName() %></td>
-								<td><%=vo.getRegDate() %></td>
-								<td><a href="<%=request.getContextPath()%>/guestbook?a=deleteform&no=<%=vo.getNo()%>">삭제</a></td>
-							</tr>
-							<tr>
-								<td colspan=4><%=vo.getContent() %></td>
-							</tr>
-						</table>
-						<% } %>
+					<c:set var='count' value='${fn:length(list) }' />
+					<c:forEach items='${list }' var='vo' varStatus='status'>
+						<li>
+							<table>
+								<tr>
+									<td>[${count - status.index }]</td>
+									<td>${vo.name }</td>
+									<td>${vo.getRegDate() }</td>
+									<td><a href="${pageContext.request.contextPath }/guestbook?a=deleteform&no=${vo.no }">삭제</a></td>
+								</tr>
+								<tr>
+									<td colspan=4>
+										${fn:replace(vo.content, newline, "<br/>") }
+									</td>
+								</tr>
+							</table>
 						<br>
-					</li>
+						</li>
+					</c:forEach>
 				</ul>
 			</div>
 		</div>
-		<jsp:include page="/WEB-INF/views/includes/navigation.jsp" />
-		<jsp:include page="/WEB-INF/views/includes/footer.jsp" />
+		<c:import url="/WEB-INF/views/includes/navigation.jsp" />
+		<c:import url="/WEB-INF/views/includes/footer.jsp" />
 	</div>
 </body>
 </html>

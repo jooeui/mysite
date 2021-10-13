@@ -5,30 +5,42 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.douzone.mysite.dao.UserDao;
 import com.douzone.mysite.vo.UserVo;
 import com.douzone.web.mvc.Action;
 import com.douzone.web.util.MvcUtils;
 
-public class JoinAction implements Action {
+public class UpdateAction implements Action {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// Access Control(보안, 인증체크)
+		HttpSession session = request.getSession();
+		UserVo authUser = (UserVo)session.getAttribute("authUser");
+		if(authUser == null) {
+			MvcUtils.redirect(request.getContextPath(), request, response);
+			return;
+		}
+		
+		Long no = authUser.getNo();
 		String name = request.getParameter("name");
-		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		String gender = request.getParameter("gender");
 		
 		UserVo vo = new UserVo();
+		vo.setNo(no);
 		vo.setName(name);
-		vo.setEmail(email);
 		vo.setPassword(password);
 		vo.setGender(gender);
 		
-		new UserDao().insert(vo);
+		new UserDao().update(vo);
+		if(!("".equals(vo.getName()))) {
+			authUser.setName(name);
+		}
 		
-		MvcUtils.redirect(request.getContextPath() + "/user?a=joinsuccess", request, response);
+		MvcUtils.redirect(request.getContextPath() + "/user?a=updateform", request, response);
 	}
 
 }

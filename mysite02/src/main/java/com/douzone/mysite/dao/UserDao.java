@@ -113,4 +113,130 @@ public class UserDao {
 
 		return conn;
 	}
+
+	public UserVo findByNo(Long no) {
+		UserVo vo = null;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			
+			String sql = "select no, name, email, gender from user where no=?";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setLong(1, no);
+			
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				Long uNo = rs.getLong(1);
+				String name = rs.getString(2);
+				String email = rs.getString(3);
+				String gender = rs.getString(4);
+				
+				vo = new UserVo();
+				vo.setNo(uNo);
+				vo.setName(name);
+				vo.setEmail(email);
+				vo.setGender(gender);
+			}
+			
+			
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			// clean up
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return vo;
+	}
+
+	public boolean update(UserVo vo) {
+		boolean result = false;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		try {
+			conn = getConnection();
+			
+			if("".equals(vo.getName())) {	
+				// name이 빈값인 경우 - name을 update 하지 않음
+				if("".equals(vo.getPassword())) {	
+					// password가 빈값인 경우 - password를 update 하지 않음
+					sql = "update user " + 
+							" set gender=? " + 
+							" where no=?";
+					pstmt = conn.prepareStatement(sql);
+					
+					pstmt.setString(1, vo.getGender());
+					pstmt.setLong(2, vo.getNo());
+				} else {	
+					// password에 값이 있는 경우
+					sql = "update user " + 
+							" set password=?, gender=? " + 
+							" where no=?";
+					pstmt = conn.prepareStatement(sql);
+					
+					pstmt.setString(1, vo.getPassword());
+					pstmt.setString(2, vo.getGender());
+					pstmt.setLong(3, vo.getNo());
+				}
+			} else { 	
+				// name에 값이 있는 경우
+				if("".equals(vo.getPassword())) {	
+					// password가 빈값인 경우 - password를 update 하지 않음
+					sql = "update user " + 
+							" set name=?, gender=? " + 
+							" where no=?";
+					pstmt = conn.prepareStatement(sql);
+					
+					pstmt.setString(1, vo.getName());
+					pstmt.setString(2, vo.getGender());
+					pstmt.setLong(3, vo.getNo());
+				} else {	
+					// password에 값이 있는 경우
+					sql = "update user " + 
+							" set name=?, password=?, gender=? " + 
+							" where no=?";
+					pstmt = conn.prepareStatement(sql);
+					
+					pstmt.setString(1, vo.getName());
+					pstmt.setString(2, vo.getPassword());
+					pstmt.setString(3, vo.getGender());
+					pstmt.setLong(4, vo.getNo());
+				}
+			}
+			
+			int count = pstmt.executeUpdate();
+			
+			result = count == 1;
+		} catch(SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			// clean up
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
 }

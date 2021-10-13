@@ -31,7 +31,7 @@ public class LoginAction implements Action {
 		HttpSession session = request.getSession(true);	// default = null
 		session.setAttribute("authUser", userVo);
 		
-		MvcUtils.redirect("/mysite02", request, response);
+		MvcUtils.redirect(request.getContextPath(), request, response);
 	}
 
 }

@@ -17,9 +17,9 @@ public class ListAction implements Action {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		GuestbookDao dao = new GuestbookDao();
-		List<GuestbookVo> gbList = dao.findAll();
+		List<GuestbookVo> list = dao.findAll();
 		
-		request.setAttribute("gbList", gbList);
+		request.setAttribute("list", list);
 		MvcUtils.forward("guestbook/list", request, response);
 	}
 
