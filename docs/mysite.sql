@@ -8,3 +8,7 @@ select no, name from user where email='' and password='';
 
 -- select02
 select * from user;
+
+select no, name, email, gender from user where no=1;
+
+-- update user set name='긴주이', email='kje_0727@naver.com', password='1234', gender='female' where no=2;
