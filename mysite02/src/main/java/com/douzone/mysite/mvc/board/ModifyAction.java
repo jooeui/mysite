@@ -30,7 +30,7 @@ public class ModifyAction implements Action {
 		Long userNo = authUser.getNo();
 		
 		if("".equals(title)) {
-			MvcUtils.redirect(request.getContextPath()+"/board", request, response);
+			MvcUtils.redirect(request.getContextPath()+"/board?a=modifyform&no="+request.getParameter("no"), request, response);
 			return;
 		}
 		
@@ -42,7 +42,7 @@ public class ModifyAction implements Action {
 		vo.setUserNo(userNo);
 		
 		new BoardDao().update(vo);
-		MvcUtils.redirect(request.getContextPath() + "/board?no=" + vo.getNo(), request, response);
+		MvcUtils.redirect(request.getContextPath() + "/board?a=view&no=" + vo.getNo(), request, response);
 	}
 
 }

@@ -16,5 +16,5 @@ select no, title, content, group_no, order_no, depth, user_no
 from board b;
 
 insert into board 
-values(null, '', '테스트 하고 있습니다', default, now(), ifnull((select max(group_no) from board b), 0)+1, 1, 0, 1);
+values(null, '', '테스트 하고 있습니다', default, now(), ifnull((select max(group_no) from board b), 0)+1, 0, 0, 1);
 update board set title='1', content='테스트' where no=2;

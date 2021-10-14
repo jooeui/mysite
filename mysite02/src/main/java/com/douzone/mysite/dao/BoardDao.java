@@ -137,58 +137,6 @@ public class BoardDao {
 		return boardVo;
 	}
 
-	public BoardVo findByPost(Long userNo, Long no) {
-		BoardVo boardVo = null;
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		try {
-			conn = getConnection();
-			
-			String sql = "select no, title, content, group_no, order_no, depth, user_no " + 
-						" from board where no=?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setLong(1, no);
-			
-			rs = pstmt.executeQuery();
-			while(rs.next()) {
-				Long pNo = rs.getLong(1);
-				String title = rs.getString(2);
-				String content = rs.getString(3);
-				Long groupNo = rs.getLong(4);
-				Long orderNo = rs.getLong(5);
-				Long depth = rs.getLong(6);
-				Long uNo = rs.getLong(7);
-				
-				boardVo = new BoardVo();
-				boardVo.setNo(pNo);
-				boardVo.setTitle(title);
-				boardVo.setContent(content);
-				boardVo.setGroupNo(groupNo);
-				boardVo.setOrderNo(orderNo);
-				boardVo.setDepth(depth);
-				boardVo.setUserNo(uNo);
-			}
-		} catch (SQLException e) {
-			System.out.println("error: " + e);
-		} finally {
-			try {
-				if (pstmt != null) {
-					pstmt.close();
-				}
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return boardVo;
-	}
-
 	public boolean hitUpdate(Long no) {
 		boolean result = false;
 		
@@ -256,7 +204,59 @@ public class BoardDao {
 		}
 		return result;
 	}
-
+	
+	public BoardVo findByPost(Long userNo, Long no) {
+		BoardVo boardVo = null;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			
+			String sql = "select no, title, content, group_no, order_no, depth, user_no " + 
+						" from board where no=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, no);
+			
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				Long pNo = rs.getLong(1);
+				String title = rs.getString(2);
+				String content = rs.getString(3);
+				Long groupNo = rs.getLong(4);
+				Long orderNo = rs.getLong(5);
+				Long depth = rs.getLong(6);
+				Long uNo = rs.getLong(7);
+				
+				boardVo = new BoardVo();
+				boardVo.setNo(pNo);
+				boardVo.setTitle(title);
+				boardVo.setContent(content);
+				boardVo.setGroupNo(groupNo);
+				boardVo.setOrderNo(orderNo);
+				boardVo.setDepth(depth);
+				boardVo.setUserNo(uNo);
+			}
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return boardVo;
+	}
+	
 	public boolean update(BoardVo vo) {
 		boolean result = false;
 		Connection conn = null;
@@ -292,5 +292,120 @@ public class BoardDao {
 		}
 		return result;
 	}
+
+	public BoardVo findByParentBoardInfo(Long no) {
+		BoardVo boardVo = null;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			
+			String sql = "select no, group_no, order_no, depth" + 
+						" from board where no=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, no);
+			
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				Long pNo = rs.getLong(1);
+				Long groupNo = rs.getLong(2);
+				Long orderNo = rs.getLong(3);
+				Long depth = rs.getLong(4);
+				
+				boardVo = new BoardVo();
+				boardVo.setNo(pNo);
+				boardVo.setGroupNo(groupNo);
+				boardVo.setOrderNo(orderNo);
+				boardVo.setDepth(depth);
+			}
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return boardVo;
+	}
+
+	public boolean orderNoUpdate(BoardVo boardVo) {
+		boolean result = false;
+		Connection conn = null;
+		String sql = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			conn = getConnection();
+			
+			sql = "update board set order_no=order_no+1 where group_no=? and order_no>?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, boardVo.getGroupNo());
+			pstmt.setLong(2, boardVo.getOrderNo());
+			
+			int count = pstmt.executeUpdate();
+			
+			result = count == 1;
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
 	
+	public boolean reply(BoardVo boardVo) {
+		boolean result = false;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			conn = getConnection();
+			
+			String sql = "insert into board values(null, ?, ?, default, now(), ?, ?, ?, ?) ";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, boardVo.getTitle());
+			pstmt.setString(2, boardVo.getContent());
+			pstmt.setLong(3, boardVo.getGroupNo());
+			pstmt.setLong(4, boardVo.getOrderNo()+1);
+			pstmt.setLong(5, boardVo.getDepth()+1);
+			pstmt.setLong(6, boardVo.getUserNo());
+			
+			int count = pstmt.executeUpdate();
+			
+			result = count == 1;
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
 }

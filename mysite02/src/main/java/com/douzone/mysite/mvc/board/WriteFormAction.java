@@ -18,7 +18,11 @@ public class WriteFormAction implements Action {
 		HttpSession session = request.getSession();
 		UserVo authUser = (UserVo)session.getAttribute("authUser");
 		if(authUser == null) {
-			MvcUtils.redirect(request.getContextPath() + "/board", request, response);
+			if(request.getParameter("no") == null) {
+				MvcUtils.redirect(request.getContextPath() + "/board", request, response);
+			} else {
+				MvcUtils.redirect(request.getContextPath() + "/board?a=view&no=" + request.getParameter("no"), request, response);
+			}
 			return;
 		}
 		

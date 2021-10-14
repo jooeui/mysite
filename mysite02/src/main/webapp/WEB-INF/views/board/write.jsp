@@ -15,11 +15,28 @@
 		<div id="content">
 			<div id="board">
 				<form class="board-form" method="post" action="${pageContext.servletContext.contextPath }/board">
-					<input type="hidden" name="a" value="write">
+					<c:choose>
+						<c:when test="${empty param.no }">
+							<input type="hidden" name="a" value="write">
+						</c:when>
+						<c:otherwise>
+							<input type="hidden" name="a" value="reply">
+							<input type="hidden" name="no" value="${param.no }">
+						</c:otherwise>
+					</c:choose>
 					
 					<table class="tbl-ex">
 						<tr>
-							<th colspan="2">글쓰기</th>
+							<th colspan="2">
+							<c:choose>
+								<c:when test="${empty param.no }">
+									글쓰기
+								</c:when>
+								<c:otherwise>
+									댓글쓰기
+								</c:otherwise>
+							</c:choose>
+							</th>
 						</tr>
 						<tr>
 							<td class="label">제목</td>

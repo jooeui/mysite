@@ -29,7 +29,7 @@ public class WriteAction implements Action {
 		Long userNo = authUser.getNo();
 		
 		if("".equals(title)) {
-			MvcUtils.redirect(request.getContextPath()+"/board", request, response);
+			MvcUtils.redirect(request.getContextPath()+"/board?a=writeform", request, response);
 			return;
 		}
 		
@@ -39,7 +39,7 @@ public class WriteAction implements Action {
 		vo.setUserNo(userNo);
 		
 		new BoardDao().write(vo);
-		MvcUtils.redirect(request.getContextPath() + "/board?no=" + vo.getNo(), request, response);
+		MvcUtils.redirect(request.getContextPath() + "/board", request, response);
 		
 	}
 

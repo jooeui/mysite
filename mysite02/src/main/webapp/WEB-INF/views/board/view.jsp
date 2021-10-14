@@ -34,6 +34,7 @@
 				</table>
 				<div class="bottom">
 					<a href="${pageContext.servletContext.contextPath }/board">글목록</a>
+					<a href="${pageContext.servletContext.contextPath }/board?a=writeform&no=${boardVo.no }">댓글</a>
 					<c:if test='${authUser.no == boardVo.userNo }'>
 						<a href="${pageContext.servletContext.contextPath }/board?a=modifyform&no=${boardVo.no }">글수정</a>
 					</c:if>
