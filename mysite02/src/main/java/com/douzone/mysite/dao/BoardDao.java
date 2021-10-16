@@ -44,7 +44,7 @@ public class BoardDao {
 			String sql = "select b.no, b.title, b.hit, " +
 						 "if(curdate() = date_format(reg_date, '%Y-%m-%d'), "
 						 	+ " date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d')), " + 
-						" b.group_no, b.order_no, b.depth, u.name " + 
+						" b.group_no, b.order_no, b.depth, u.name" + 
 						" from board b, user u " + 
 						" where b.user_no = u.no " + 
 						" order by b.group_no desc, b.order_no asc ";
@@ -406,6 +406,72 @@ public class BoardDao {
 				e.printStackTrace();
 			}
 		}
+		return result;
+	}
+
+	public List<BoardVo> findPrintList(long listLimit, long limitCount) {
+		List<BoardVo> result = new ArrayList<>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			
+			String sql = "select b.no, b.title, b.hit, " +
+						 "if(curdate() = date_format(reg_date, '%Y-%m-%d'), "
+						 	+ " date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d')), " + 
+						" b.group_no, b.order_no, b.depth, u.name, b.user_no " + 
+						" from board b, user u " + 
+						" where b.user_no = u.no " + 
+						" order by b.group_no desc, b.order_no asc " + 
+						" limit ?, ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, listLimit);
+			pstmt.setLong(2, limitCount);
+			
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				Long no = rs.getLong(1);
+				String title = rs.getString(2);
+				Long hit = rs.getLong(3);
+				String regDate = rs.getString(4);
+				Long groupNo = rs.getLong(5);
+				Long orderNo = rs.getLong(6);
+				Long depth = rs.getLong(7);
+				String writer = rs.getString(8);
+				Long userNo = rs.getLong(9);
+				
+				
+				BoardVo vo = new BoardVo();
+				vo.setNo(no);
+				vo.setTitle(title);
+				vo.setHit(hit);
+				vo.setRegDate(regDate);
+				vo.setGroupNo(groupNo);
+				vo.setOrderNo(orderNo);
+				vo.setDepth(depth);
+				vo.setWriter(writer);
+				vo.setUserNo(userNo);
+				
+				result.add(vo);
+			}
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		return result;
 	}
 }

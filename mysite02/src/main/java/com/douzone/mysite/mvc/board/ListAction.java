@@ -16,10 +16,21 @@ public class ListAction implements Action {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String sp = request.getParameter("sp");
+		
+		if (sp == null) {
+			sp = "1";
+		}
+        Long selectPage = Long.parseLong(sp);
+        Long limitCount = 5L;
+        
 		BoardDao dao = new BoardDao();
 		List<BoardVo> list = dao.findAll();
-		
 		request.setAttribute("list", list);
+		
+		List<BoardVo> printList = dao.findPrintList((selectPage-1)*limitCount, limitCount);
+		request.setAttribute("printList", printList);
+		
 		MvcUtils.forward("board/list", request, response);
 	}
 

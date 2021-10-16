@@ -28,10 +28,22 @@
 						<th>작성일</th>
 						<th>&nbsp;</th>
 					</tr>
-					<c:set var='count' value='${fn:length(list) }' />
-					<c:forEach items='${list }' var='vo' varStatus='status'>
+					<%-- sp(select pager): 현재 페이지 번호 --%>
+					<c:choose>
+						<c:when test="${empty param.sp }">
+							<c:set var="sp" value="1"/>
+						</c:when>
+						<c:otherwise>
+							<c:set var="sp" value="${param.sp }"/>
+						</c:otherwise>
+					</c:choose> 
+
+					<c:set var="count" value="${fn:length(list) }" />
+					<c:set var="limitCount" value="5" />
+					
+					<c:forEach items='${printList }' var='vo' varStatus='status'>
 						<tr>
-							<td>${count-status.index }</td>
+							<td>${count-(limitCount*(sp-1))-status.index }</td>
 							<td style="text-align: left; padding-left: ${20*vo.depth}px">
 								<c:if test="${vo.depth > 0 }">
 									<img src="${pageContext.servletContext.contextPath }/assets/images/reply.png">
@@ -44,9 +56,11 @@
 							<td>${vo.hit }</td>
 							<td>${vo.regDate }</td>
 							<td>
-								<a href="${pageContext.servletContext.contextPath }/board?a=delete&no=${vo.no}" class="del">
-									삭제
-								</a>
+								<c:if test="${authUser.no eq vo.userNo }" >
+									<a href="${pageContext.servletContext.contextPath }/board?a=delete&no=${vo.no}" class="del">
+										<img src="${pageContext.servletContext.contextPath }/assets/images/recycle.png">
+									</a>
+								</c:if>
 							</td>
 						</tr>
 					</c:forEach>
@@ -55,19 +69,76 @@
 				<!-- pager 추가 -->
 				<div class="pager">
 					<ul>
-						<li><a href="">◀</a></li>
-						<li><a href="">1</a></li>
-						<li class="selected">2</li>
-						<li><a href="">3</a></li>
-						<li>4</li>
-						<li>5</li>
-						<li><a href="">▶</a></li>
+						<%-- 이전 페이지 번호로 이동
+								만약 현재 페이지가 1이라면 이전 페이지 이동 화살표 안 뜨게 --%>
+						<c:choose>
+							<c:when test="${sp == 1 }">
+								<li>◀</li>
+							</c:when>
+							<c:when test="${sp != 1 }">
+								<li><a href="${pageContext.servletContext.contextPath }/board?sp=${sp-1 }">◀</a></li>
+							</c:when>
+						</c:choose>
+						
+						<%-- 페이징 시작, 끝 번호 설정 --%>
+						<c:set var="pages" value="${(count/limitCount)%1 > 0 ? (count/limitCount)+1 : (count/limitCount) }" />
+						<fmt:parseNumber value="${pages }" var="pages" integerOnly="true" />
+						<c:choose>
+							<c:when test="${pages<6 || sp<4}">
+								<c:set var="startPage" value="1" />
+								<c:set var="endPage" value="5"/>
+							</c:when>
+							<c:when test="${(pages-sp)<=1 }">
+								<c:set var="endPage" value="${pages }"/>
+								<c:set var="startPage" value="${endPage-4 }" />
+							</c:when>
+							<c:otherwise>
+								<c:set var="startPage" value="${sp-2}" />
+								<c:set var="endPage" value="${sp+2}" />
+							</c:otherwise>
+						</c:choose>
+						
+						<%-- 페이징 번호 출력 --%>
+						<c:forEach begin="${startPage }" end="${endPage }" var="pager" step="1">
+							<c:choose>
+								<c:when test="${sp == pager }">
+									<li class="selected">${pager }</li>
+								</c:when>
+								<c:when test="${pager > pages }">
+									<li>${pager }</li>
+								</c:when>
+								<c:otherwise>
+									<li><a href="${pageContext.servletContext.contextPath }/board?sp=${pager }">${pager }</a></li>
+								</c:otherwise>
+							</c:choose>
+						</c:forEach>
+						
+						<%-- 다음 페이지 번호로 이동
+								만약 현재 페이지가 마지막 페이지(lastPage)라면 다음 페이지 이동 화살표 안 뜨게 --%>
+						<c:choose>
+							<c:when test="${sp != pages }">
+								<li><a href="${pageContext.servletContext.contextPath }/board?sp=${sp+1 }">▶</a></li>
+							</c:when>
+							<c:otherwise>
+								<li>▶</li>
+							</c:otherwise>
+						</c:choose>
 					</ul>
 				</div>					
 				<!-- pager 추가 -->
 				
 				<div class="bottom">
-					<a href="${pageContext.servletContext.contextPath }/board?a=writeform" id="new-book">글쓰기</a>
+					<c:choose>
+						<c:when test="${authUser == null }">
+							<%-- 
+								<a style="border:1px solid #aaa; color: #aaa; background-color: #ccc; cursor: default" id="new-book">글쓰기</a>
+							--%>
+							<a href="${pageContext.servletContext.contextPath }/user?a=loginform" target="_blank" id="new-book">글쓰기</a>
+						</c:when>
+						<c:otherwise>
+							<a href="${pageContext.servletContext.contextPath }/board?a=writeform" id="new-book">글쓰기</a>
+						</c:otherwise>
+					</c:choose>
 				</div>				
 			</div>
 		</div>
