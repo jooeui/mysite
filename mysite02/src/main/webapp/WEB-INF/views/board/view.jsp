@@ -37,7 +37,14 @@
 					<c:if test='${authUser.no == boardVo.userNo }'>
 						<a href="${pageContext.servletContext.contextPath }/board?a=modifyform&no=${boardVo.no }">글수정</a>
 					</c:if>
-					<a href="${pageContext.servletContext.contextPath }/board?a=writeform&no=${boardVo.no }">댓글</a>
+					<c:choose>
+						<c:when test="${empty authUser }">
+							<a href="${pageContext.servletContext.contextPath }/user?a=loginform" target="_blank">댓글</a>
+						</c:when>
+						<c:otherwise>
+							<a href="${pageContext.servletContext.contextPath }/board?a=writeform&no=${boardVo.no }">댓글</a>
+						</c:otherwise>
+					</c:choose>					
 				</div>
 			</div>
 		</div>

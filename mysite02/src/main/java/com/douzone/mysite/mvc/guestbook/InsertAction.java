@@ -19,6 +19,11 @@ public class InsertAction implements Action {
 		String password = request.getParameter("pass");
 		String content = request.getParameter("content");
 		
+		if("".equals(name) || "".equals(password) || "".equals(content)) {
+			MvcUtils.redirect(request.getContextPath() + "/guestbook", request, response);
+			return;
+		}
+		
 		GuestbookVo vo = new GuestbookVo();
 		vo.setName(name);
 		vo.setPassword(password);
@@ -26,7 +31,7 @@ public class InsertAction implements Action {
 		
 		new GuestbookDao().insert(vo);
 		
-		MvcUtils.redirect("/mysite02/guestbook?a=list", request, response);
+		MvcUtils.redirect(request.getContextPath() + "/guestbook", request, response);
 	}
 
 }

@@ -44,24 +44,39 @@
 					<c:forEach items='${printList }' var='vo' varStatus='status'>
 						<tr>
 							<td>${count-(limitCount*(sp-1))-status.index }</td>
-							<td style="text-align: left; padding-left: ${20*vo.depth}px">
-								<c:if test="${vo.depth > 0 }">
-									<img src="${pageContext.servletContext.contextPath }/assets/images/reply.png">
-								</c:if>
-								<a href="${pageContext.servletContext.contextPath }/board?a=view&no=${vo.no}">
-									${vo.title }
-								</a>
-							</td>
-							<td>${vo.writer }</td>
-							<td>${vo.hit }</td>
-							<td>${vo.regDate }</td>
-							<td>
-								<c:if test="${authUser.no eq vo.userNo }" >
-									<a href="${pageContext.servletContext.contextPath }/board?a=delete&no=${vo.no}" class="del">
-										<img src="${pageContext.servletContext.contextPath }/assets/images/recycle.png">
+							<c:choose>
+								<c:when test="${vo.deleteFlag eq 'N' }">
+									<td style="text-align: left; padding-left: ${20*vo.depth}px">
+									<c:if test="${vo.depth > 0 }">
+										<a href="${pageContext.servletContext.contextPath }/board?a=delete&no=${vo.no}">
+											<img src="${pageContext.servletContext.contextPath }/assets/images/reply.png">
+										</a>
+									</c:if>
+									<a href="${pageContext.servletContext.contextPath }/board?a=view&no=${vo.no}">
+										${vo.title }
 									</a>
-								</c:if>
-							</td>
+									</td>
+									<td>${vo.writer }</td>
+									<td>${vo.hit }</td>
+									<td>${vo.regDate }</td>
+									<td>
+										<c:if test="${authUser.no eq vo.userNo }" >
+											<a href="${pageContext.servletContext.contextPath }/board?a=deleteform&no=${vo.no}" class="del">
+												<img src="${pageContext.servletContext.contextPath }/assets/images/recycle.png">
+											</a>
+										</c:if>
+									</td>
+								</c:when>
+								<c:otherwise>
+									<td style="text-align: left; padding-left: ${20*vo.depth}px">
+										삭제된 게시글입니다.
+									</td>
+									<td>-</td>
+									<td>-</td>
+									<td>-</td>
+									<td></td>
+								</c:otherwise>
+							</c:choose>
 						</tr>
 					</c:forEach>
 				</table>
@@ -129,7 +144,7 @@
 				
 				<div class="bottom">
 					<c:choose>
-						<c:when test="${authUser == null }">
+						<c:when test="${empty authUser }">
 							<%-- 
 								<a style="border:1px solid #aaa; color: #aaa; background-color: #ccc; cursor: default" id="new-book">글쓰기</a>
 							--%>

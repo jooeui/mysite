@@ -178,7 +178,7 @@ public class BoardDao {
 			conn = getConnection();
 			
 			String sql = "insert into board " + 
-						" values(null, ?, ?, default, now(), ifnull((select max(group_no) from board b), 0)+1, 0, 0, ?) ";
+						" values(null, ?, ?, default, now(), ifnull((select max(group_no) from board b), 0)+1, 0, 0, ?, default) ";
 			pstmt = conn.prepareStatement(sql);
 			
 			pstmt.setString(1, vo.getTitle());
@@ -380,7 +380,7 @@ public class BoardDao {
 		try {
 			conn = getConnection();
 			
-			String sql = "insert into board values(null, ?, ?, default, now(), ?, ?, ?, ?) ";
+			String sql = "insert into board values(null, ?, ?, default, now(), ?, ?, ?, ?, default) ";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, boardVo.getTitle());
 			pstmt.setString(2, boardVo.getContent());
@@ -422,7 +422,7 @@ public class BoardDao {
 			String sql = "select b.no, b.title, b.hit, " +
 						 "if(curdate() = date_format(reg_date, '%Y-%m-%d'), "
 						 	+ " date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d')), " + 
-						" b.group_no, b.order_no, b.depth, u.name, b.user_no " + 
+						" b.group_no, b.order_no, b.depth, u.name, b.user_no, b.delete_flag " + 
 						" from board b, user u " + 
 						" where b.user_no = u.no " + 
 						" order by b.group_no desc, b.order_no asc " + 
@@ -442,6 +442,7 @@ public class BoardDao {
 				Long depth = rs.getLong(7);
 				String writer = rs.getString(8);
 				Long userNo = rs.getLong(9);
+				String deleteFlag = rs.getString(10);
 				
 				
 				BoardVo vo = new BoardVo();
@@ -454,6 +455,7 @@ public class BoardDao {
 				vo.setDepth(depth);
 				vo.setWriter(writer);
 				vo.setUserNo(userNo);
+				vo.setDeleteFlag(deleteFlag);
 				
 				result.add(vo);
 			}
@@ -472,6 +474,44 @@ public class BoardDao {
 			}
 		}
 		
+		return result;
+	}
+
+	public boolean delete(BoardVo vo, String pw) {
+		boolean result = false;
+		Connection conn = null;
+		String sql = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			conn = getConnection();
+			
+			sql = "update board set delete_flag='Y' " + 
+				 " where no=? and user_no=? " + 
+					" and if((select count(*) from user where no=? and password=?) = 1, true, false) ";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, vo.getNo());
+			pstmt.setLong(2, vo.getUserNo());
+			pstmt.setLong(3, vo.getUserNo());
+			pstmt.setString(4, pw);
+			
+			int count = pstmt.executeUpdate();
+			
+			result = count == 1;
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 		return result;
 	}
 }
