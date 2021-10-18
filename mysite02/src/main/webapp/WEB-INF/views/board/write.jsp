@@ -33,7 +33,7 @@
 									글쓰기
 								</c:when>
 								<c:otherwise>
-									댓글쓰기
+									답글쓰기
 								</c:otherwise>
 							</c:choose>
 							</th>

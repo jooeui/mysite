@@ -39,10 +39,10 @@
 					</c:if>
 					<c:choose>
 						<c:when test="${empty authUser }">
-							<a href="${pageContext.servletContext.contextPath }/user?a=loginform" target="_blank">댓글</a>
+							<a href="${pageContext.servletContext.contextPath }/user?a=loginform" target="_blank">답글</a>
 						</c:when>
 						<c:otherwise>
-							<a href="${pageContext.servletContext.contextPath }/board?a=writeform&no=${boardVo.no }">댓글</a>
+							<a href="${pageContext.servletContext.contextPath }/board?a=writeform&no=${boardVo.no }">답글</a>
 						</c:otherwise>
 					</c:choose>					
 				</div>

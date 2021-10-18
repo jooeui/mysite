@@ -514,4 +514,138 @@ public class BoardDao {
 		}
 		return result;
 	}
+
+	public List<BoardVo> keywordSearch(String kwd) {
+		List<BoardVo> result = new ArrayList<>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			
+			String sql = "select b.no, b.title, b.hit, " +
+						 "if(curdate() = date_format(reg_date, '%Y-%m-%d'), "
+						 	+ " date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d')), " + 
+						" b.group_no, b.order_no, b.depth, u.name" + 
+						" from board b, user u " + 
+						" where b.user_no = u.no " + 
+						"	and title like ?" +
+						"	and delete_flag = 'n' " + 
+						" order by b.group_no desc, b.order_no asc ";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, "%"+kwd+"%");
+			
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				Long no = rs.getLong(1);
+				String title = rs.getString(2);
+				Long hit = rs.getLong(3);
+				String regDate = rs.getString(4);
+				Long groupNo = rs.getLong(5);
+				Long orderNo = rs.getLong(6);
+				Long depth = rs.getLong(7);
+				String writer = rs.getString(8);
+				
+				BoardVo vo = new BoardVo();
+				vo.setNo(no);
+				vo.setTitle(title);
+				vo.setHit(hit);
+				vo.setRegDate(regDate);
+				vo.setGroupNo(groupNo);
+				vo.setOrderNo(orderNo);
+				vo.setDepth(depth);
+				vo.setWriter(writer);
+				
+				result.add(vo);
+			}
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return result;
+	}
+	
+
+	public List<BoardVo> searchPrintList(long listLimit, Long limitCount, String kwd) {
+		List<BoardVo> result = new ArrayList<>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			
+			String sql = "select b.no, b.title, b.hit, " +
+						 "if(curdate() = date_format(reg_date, '%Y-%m-%d'), "
+						 	+ " date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d')), " + 
+						" b.group_no, b.order_no, b.depth, u.name, b.user_no, b.delete_flag " + 
+						" from board b, user u " + 
+						" where b.user_no = u.no " + 
+						"	and title like ?" +
+						"	and delete_flag = 'n' " + 
+						" order by b.group_no desc, b.order_no asc " + 
+						" limit ?, ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, "%"+kwd+"%");
+			pstmt.setLong(2, listLimit);
+			pstmt.setLong(3, limitCount);
+			
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				Long no = rs.getLong(1);
+				String title = rs.getString(2);
+				Long hit = rs.getLong(3);
+				String regDate = rs.getString(4);
+				Long groupNo = rs.getLong(5);
+				Long orderNo = rs.getLong(6);
+				Long depth = rs.getLong(7);
+				String writer = rs.getString(8);
+				Long userNo = rs.getLong(9);
+				String deleteFlag = rs.getString(10);
+				
+				
+				BoardVo vo = new BoardVo();
+				vo.setNo(no);
+				vo.setTitle(title);
+				vo.setHit(hit);
+				vo.setRegDate(regDate);
+				vo.setGroupNo(groupNo);
+				vo.setOrderNo(orderNo);
+				vo.setDepth(depth);
+				vo.setWriter(writer);
+				vo.setUserNo(userNo);
+				vo.setDeleteFlag(deleteFlag);
+				
+				result.add(vo);
+			}
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
 }
