@@ -19,6 +19,11 @@ public class ViewAction implements Action {
 		
 		new BoardDao().hitUpdate(no);
 		BoardVo boardVo = new BoardDao().findByTitleAndContent(no);
+		if("Y".equals(boardVo.getDeleteFlag())) {
+			MvcUtils.redirect(request.getContextPath() + "/board", request, response);
+			return;
+		}
+			
 		request.setAttribute("boardVo", boardVo);
 		
 		MvcUtils.forward("board/view", request, response);

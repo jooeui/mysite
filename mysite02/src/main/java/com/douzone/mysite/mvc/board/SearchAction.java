@@ -29,8 +29,8 @@ public class SearchAction implements Action {
         Long limitCount = 5L;
         
 		BoardDao dao = new BoardDao();
-		List<BoardVo> list = dao.keywordSearch(kwd);
-		request.setAttribute("list", list);
+		Long count = dao.searchCount(kwd);
+		request.setAttribute("count", count);
 		
 		List<BoardVo> printList = dao.searchPrintList((selectPage-1)*limitCount, limitCount, kwd);
 		request.setAttribute("printList", printList);

@@ -25,8 +25,8 @@ public class ListAction implements Action {
         Long limitCount = 5L;
         
 		BoardDao dao = new BoardDao();
-		List<BoardVo> list = dao.findAll();
-		request.setAttribute("list", list);
+		Long count = dao.countAll();
+		request.setAttribute("count", count);
 		
 		List<BoardVo> printList = dao.findPrintList((selectPage-1)*limitCount, limitCount);
 		request.setAttribute("printList", printList);

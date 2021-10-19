@@ -91,6 +91,41 @@ public class BoardDao {
 		return result;
 	}
 	
+	public Long countAll() {
+		Long count = 0L;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			
+			String sql = "select count(*) from board ";
+			pstmt = conn.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				count = rs.getLong(1);
+			}
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return count;
+	}
+	
 	public BoardVo findByTitleAndContent(Long no) {
 		BoardVo boardVo = null;
 		
@@ -101,7 +136,7 @@ public class BoardDao {
 		try {
 			conn = getConnection();
 			
-			String selectPost = "select no, title, content, user_no " + 
+			String selectPost = "select no, title, content, user_no, delete_flag " + 
 								" from board where no=?";
 			pstmt = conn.prepareStatement(selectPost);
 			pstmt.setLong(1, no);
@@ -112,12 +147,14 @@ public class BoardDao {
 				String title = rs.getString(2);
 				String content = rs.getString(3);
 				Long userNo = rs.getLong(4);
+				String deleteFlag = rs.getString(5);
 				
 				boardVo = new BoardVo();
 				boardVo.setNo(pNo);
 				boardVo.setTitle(title);
 				boardVo.setContent(content);
 				boardVo.setUserNo(userNo);
+				boardVo.setDeleteFlag(deleteFlag);
 			}
 		} catch (SQLException e) {
 			System.out.println("error: " + e);
@@ -215,7 +252,7 @@ public class BoardDao {
 		try {
 			conn = getConnection();
 			
-			String sql = "select no, title, content, group_no, order_no, depth, user_no " + 
+			String sql = "select no, title, content, group_no, order_no, depth, user_no, delete_flag " + 
 						" from board where no=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setLong(1, no);
@@ -229,6 +266,7 @@ public class BoardDao {
 				Long orderNo = rs.getLong(5);
 				Long depth = rs.getLong(6);
 				Long uNo = rs.getLong(7);
+				String deleteFlag = rs.getString(8);
 				
 				boardVo = new BoardVo();
 				boardVo.setNo(pNo);
@@ -238,6 +276,7 @@ public class BoardDao {
 				boardVo.setOrderNo(orderNo);
 				boardVo.setDepth(depth);
 				boardVo.setUserNo(uNo);
+				boardVo.setDeleteFlag(deleteFlag);
 			}
 		} catch (SQLException e) {
 			System.out.println("error: " + e);
@@ -515,8 +554,8 @@ public class BoardDao {
 		return result;
 	}
 
-	public List<BoardVo> keywordSearch(String kwd) {
-		List<BoardVo> result = new ArrayList<>();
+	public Long searchCount(String kwd) {
+		Long searchCount = 0L;
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -525,40 +564,15 @@ public class BoardDao {
 		try {
 			conn = getConnection();
 			
-			String sql = "select b.no, b.title, b.hit, " +
-						 "if(curdate() = date_format(reg_date, '%Y-%m-%d'), "
-						 	+ " date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d')), " + 
-						" b.group_no, b.order_no, b.depth, u.name" + 
-						" from board b, user u " + 
-						" where b.user_no = u.no " + 
-						"	and title like ?" +
-						"	and delete_flag = 'n' " + 
-						" order by b.group_no desc, b.order_no asc ";
+			String sql = "select count(*) from board" + 
+						" where title like ?" +
+						"	and delete_flag = 'n' ";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, "%"+kwd+"%");
 			
 			rs = pstmt.executeQuery();
 			while(rs.next()) {
-				Long no = rs.getLong(1);
-				String title = rs.getString(2);
-				Long hit = rs.getLong(3);
-				String regDate = rs.getString(4);
-				Long groupNo = rs.getLong(5);
-				Long orderNo = rs.getLong(6);
-				Long depth = rs.getLong(7);
-				String writer = rs.getString(8);
-				
-				BoardVo vo = new BoardVo();
-				vo.setNo(no);
-				vo.setTitle(title);
-				vo.setHit(hit);
-				vo.setRegDate(regDate);
-				vo.setGroupNo(groupNo);
-				vo.setOrderNo(orderNo);
-				vo.setDepth(depth);
-				vo.setWriter(writer);
-				
-				result.add(vo);
+				searchCount = rs.getLong(1);
 			}
 		} catch (SQLException e) {
 			System.out.println("error: " + e);
@@ -575,7 +589,7 @@ public class BoardDao {
 			}
 		}
 
-		return result;
+		return searchCount;
 	}
 	
 

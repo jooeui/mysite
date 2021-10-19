@@ -28,6 +28,11 @@ public class ModifyFormAction implements Action {
 		Long no = Long.parseLong(request.getParameter("no"));
 		BoardVo boardVo = new BoardDao().findByPost(userNo, no);
 		
+		if(userNo != boardVo.getUserNo() || "Y".equals(boardVo.getDeleteFlag())) {
+			MvcUtils.redirect(request.getContextPath() + "/board", request, response);
+			return;
+		}
+		
 		request.setAttribute("boardVo", boardVo);
 		MvcUtils.forward("/board/modify", request, response);
 	}
