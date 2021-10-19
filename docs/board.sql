@@ -51,6 +51,6 @@ select b.no, b.title, b.hit,
         b.group_no, b.order_no, b.depth, u.name, b.delete_flag
 from board b, user u
 where b.user_no = u.no
-	and title like '%안%'
+	and title like '%%'
     and delete_flag = 'N'
 order by b.group_no desc, b.order_no asc;
