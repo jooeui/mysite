@@ -101,6 +101,7 @@ public class UserController {
 		
 		userService.updateUser(userVo);
 		
+		authUser.setName(userVo.getName());
 		return "redirect:/user/update";
 	}
 }
