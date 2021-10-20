@@ -39,7 +39,11 @@
 						<input id="agree-prov" type="checkbox" name="agreeProv" value="y">
 						<label>서비스 약관에 동의합니다.</label>
 					</fieldset>
-					
+					<c:if test='${result == "fail" }'>
+						<p>
+							회원가입에 실패 했습니다.
+						</p>
+					</c:if>
 					<input type="submit" value="가입하기">
 					
 				</form>

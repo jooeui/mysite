@@ -35,6 +35,49 @@ from board b,
 	  where delete_flag = 'Y' 
 		and order_no);
 
+select * from board;
+
+select group_no, count(*)
+from board
+group by group_no;
+
+select b.no
+from board b,
+	(select group_no, count(*) as count
+		from board
+		group by group_no) b2
+where b.group_no = b2.group_no
+	and order_no = 0
+	and delete_flag = 'Y'
+    and b2.count = 1;
+    
+select b.no, b.title, b.hit, 
+		if(curdate()=date_format(reg_date, '%Y-%m-%d'), date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d.')) as reg_date, 
+        b.group_no, b.order_no, b.depth, u.name, b.delete_flag
+from board b, user u
+where b.user_no = u.no
+	and b.no not in (select b.no
+					from board b,
+						(select group_no, count(*) as count
+							from board
+							group by group_no) b2
+						where b.group_no = b2.group_no
+							and order_no = 0
+							and delete_flag = 'Y'
+							and b2.count = 1)
+order by b.group_no desc, b.order_no asc;
+select count(*) from board;
+select count(*) from board
+where no not in (select b.no
+				 from board b,
+					  (select group_no, count(*) as count
+					   from board
+							group by group_no) b2
+						where b.group_no = b2.group_no
+							and order_no = 0
+							and delete_flag = 'Y'
+							and b2.count = 1);
+
 -- select b.no, b.title, b.hit, 
 -- 		if(curdate()=date_format(reg_date, '%Y-%m-%d'), date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d.')) as reg_date, 
 --         b.group_no, b.order_no, b.depth, u.name, b.delete_flag 

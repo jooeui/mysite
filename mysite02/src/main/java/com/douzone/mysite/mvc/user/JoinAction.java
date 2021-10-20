@@ -19,6 +19,12 @@ public class JoinAction implements Action {
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		String gender = request.getParameter("gender");
+
+		if("".equals(name) || "".equals(email) || "".equals(password)) {
+			request.setAttribute("result", "fail");
+			MvcUtils.forward("user/joinform", request, response);
+			return;
+		}
 		
 		UserVo vo = new UserVo();
 		vo.setName(name);

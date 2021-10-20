@@ -28,22 +28,10 @@
 						<th>작성일</th>
 						<th>&nbsp;</th>
 					</tr>
-					<%-- sp(select pager): 현재 페이지 번호 --%>
-					<c:choose>
-						<c:when test="${empty param.sp }">
-							<c:set var="sp" value="1"/>
-						</c:when>
-						<c:otherwise>
-							<c:set var="sp" value="${param.sp }"/>
-						</c:otherwise>
-					</c:choose> 
-
-					<c:set var="count" value="${count }" />
-					<c:set var="limitCount" value="5" />
 					
 					<c:forEach items='${printList }' var='vo' varStatus='status'>
 						<tr>
-							<td>${count-(limitCount*(sp-1))-status.index }</td>
+							<td>${printNoCal - status.index }</td>
 							<c:choose>
 								<c:when test="${vo.deleteFlag eq 'N' }">
 									<td style="text-align: left; padding-left: ${20*vo.depth}px">
@@ -90,26 +78,8 @@
 							<c:when test="${sp == 1 }">
 								<li>◀</li>
 							</c:when>
-							<c:when test="${sp != 1 }">
-								<li><a href="${pageContext.servletContext.contextPath }/board?sp=${sp-1 }">◀</a></li>
-							</c:when>
-						</c:choose>
-						
-						<%-- 페이징 시작, 끝 번호 설정 --%>
-						<c:set var="pages" value="${(count/limitCount)%1 > 0 ? (count/limitCount)+1 : (count/limitCount) }" />
-						<fmt:parseNumber value="${pages }" var="pages" integerOnly="true" />
-						<c:choose>
-							<c:when test="${pages<6 || sp<4}">
-								<c:set var="startPage" value="1" />
-								<c:set var="endPage" value="5"/>
-							</c:when>
-							<c:when test="${(pages-sp)<=1 }">
-								<c:set var="endPage" value="${pages }"/>
-								<c:set var="startPage" value="${endPage-4 }" />
-							</c:when>
 							<c:otherwise>
-								<c:set var="startPage" value="${sp-2}" />
-								<c:set var="endPage" value="${sp+2}" />
+								<li><a href="${pageContext.servletContext.contextPath }/board?sp=${sp-1 }">◀</a></li>
 							</c:otherwise>
 						</c:choose>
 						
@@ -119,7 +89,7 @@
 								<c:when test="${sp == pager }">
 									<li class="selected">${pager }</li>
 								</c:when>
-								<c:when test="${pager > pages }">
+								<c:when test="${pager > lastPage }">
 									<li>${pager }</li>
 								</c:when>
 								<c:otherwise>
@@ -131,7 +101,7 @@
 						<%-- 다음 페이지 번호로 이동
 								만약 현재 페이지가 마지막 페이지(lastPage)라면 다음 페이지 이동 화살표 안 뜨게 --%>
 						<c:choose>
-							<c:when test="${sp != pages }">
+							<c:when test="${sp != lastPage }">
 								<li><a href="${pageContext.servletContext.contextPath }/board?sp=${sp+1 }">▶</a></li>
 							</c:when>
 							<c:otherwise>

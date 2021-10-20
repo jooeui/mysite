@@ -20,24 +20,20 @@ public class GuestbookDao {
 		try {
 			conn = getConnection();
 			
-			// 3. SQL 준비
 			String sql = "insert into guestbook " +
 						" values(null, ?, ?, ?, now()) ";
 			pstmt = conn.prepareStatement(sql);
 			
-			// 4. 바인딩(binding)
 			pstmt.setString(1, vo.getName());
 			pstmt.setString(2, vo.getPassword());
 			pstmt.setString(3, vo.getContent());
 			
-			// 5. SQL 실행
 			int count = pstmt.executeUpdate();
 			
 			result = count == 1;
 		} catch (SQLException e) {
 			System.out.println("error: " + e);
 		} finally {
-			// clean up
 			try {
 				if (pstmt != null) {
 					pstmt.close();
@@ -52,7 +48,42 @@ public class GuestbookDao {
 		return result;
 	}
 	
-	public List<GuestbookVo> findAll(){
+	public Long countAll() {
+		Long count = 0L;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			
+			String sql = "select count(*) from guestbook ";
+			pstmt = conn.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				count = rs.getLong(1);
+			}
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return count;
+	}
+	
+	public List<GuestbookVo> printList(long listLimit, long limitCount){
 		List<GuestbookVo> result = new ArrayList<>();
 		
 		Connection conn = null;
@@ -62,15 +93,14 @@ public class GuestbookDao {
 		try {
 			conn = getConnection();
 			
-			// 3. SQL 준비
 			String sql = "select no, name, date_format(reg_date, '%Y/%m/%d %H:%i:%s'), message " + 
 						 " from guestbook " + 
-						 " order by reg_date desc ";
+						 " order by reg_date desc " +
+						 " limit ?, ?";
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, listLimit);
+			pstmt.setLong(2, limitCount);
 			
-			// 4. 바인딩(binding)
-			
-			// 5. SQL 실행
 			rs = pstmt.executeQuery();
 			while(rs.next()) {
 				Long no = rs.getLong(1);
@@ -89,7 +119,6 @@ public class GuestbookDao {
 		} catch (SQLException e) {
 			System.out.println("error: " + e);
 		} finally {
-			// clean up
 			try {
 				if (pstmt != null) {
 					pstmt.close();
@@ -113,24 +142,20 @@ public class GuestbookDao {
 		try {
 			conn = getConnection();
 			
-			// 3. SQL 준비
 			String sql = "delete from guestbook " + 
 						" where no=? " + 
 						"	and password=? ";
 			pstmt = conn.prepareStatement(sql);
 			
-			// 4. 바인딩(binding)
 			pstmt.setLong(1, vo.getNo());
 			pstmt.setString(2, vo.getPassword());
 			
-			// 5. SQL 실행
 			int count = pstmt.executeUpdate();
 			
 			result = count == 1;
 		} catch (SQLException e) {
 			System.out.println("error: " + e);
 		} finally {
-			// clean up
 			try {
 				if (pstmt != null) {
 					pstmt.close();
@@ -149,11 +174,8 @@ public class GuestbookDao {
 		Connection conn = null;
 
 		try {
-			// 1. JDBC Driver 로딩
-			// ClassNotFoundException은 던지면 받는 쪽에서 이상하기 때문에 여기서 처리
 			Class.forName("org.mariadb.jdbc.Driver");
 
-			// 2. 연결하기
 			String url = "jdbc:mysql://127.0.0.1:3306/webdb?charset=utf8?";
 			conn = DriverManager.getConnection(url, "webdb", "webdb");
 		} catch (ClassNotFoundException e) {

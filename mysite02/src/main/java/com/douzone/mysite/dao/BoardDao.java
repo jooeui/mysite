@@ -101,7 +101,16 @@ public class BoardDao {
 		try {
 			conn = getConnection();
 			
-			String sql = "select count(*) from board ";
+			String sql = "select count(*) from board " + 
+						" where no not in (select b.no " + 
+						"				   from board b, " + 
+						"						(select group_no, count(*) as count " + 
+						"					     from board " + 
+						"						 group by group_no) b2 " + 
+						"				   where b.group_no = b2.group_no " + 
+						"					  and order_no = 0 " + 
+						"					  and delete_flag = 'Y' " + 
+						"					  and b2.count = 1)";
 			pstmt = conn.prepareStatement(sql);
 			
 			rs = pstmt.executeQuery();
@@ -459,13 +468,22 @@ public class BoardDao {
 			conn = getConnection();
 			
 			String sql = "select b.no, b.title, b.hit, " +
-						 "if(curdate() = date_format(reg_date, '%Y-%m-%d'), "
-						 	+ " date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d')), " + 
-						" b.group_no, b.order_no, b.depth, u.name, b.user_no, b.delete_flag " + 
-						" from board b, user u " + 
-						" where b.user_no = u.no " + 
-						" order by b.group_no desc, b.order_no asc " + 
-						" limit ?, ?";
+						 "if(curdate() = date_format(reg_date, '%Y-%m-%d'), " + 
+						 " date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d')), " + 
+						 " b.group_no, b.order_no, b.depth, u.name, b.user_no, b.delete_flag " + 
+						 " from board b, user u " + 
+						 " where b.user_no = u.no " + 
+						 "	  and b.no not in (select b.no " +
+						 "					   from board b, " +
+						 "							(select group_no, count(*) as count" +
+						 "							 from board " + 
+						 "						     group by group_no) b2 " + 
+						 "					   where b.group_no = b2.group_no " +
+						 "						  and order_no = 0 " +
+						 "						  and delete_flag = 'Y' " +
+						 "						  and b2.count = 1) " +
+						 " order by b.group_no desc, b.order_no asc " + 
+						 " limit ?, ?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setLong(1, listLimit);
 			pstmt.setLong(2, limitCount);
