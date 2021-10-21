@@ -24,11 +24,21 @@ public class ModifyFormAction implements Action {
 			return;
 		}
 		
+		String no = request.getParameter("no");
+		boolean isNumeric = no.matches("^\\d+?");
+		if (!isNumeric) {
+			MvcUtils.redirect(request.getContextPath()+"/board", request, response);
+			return;
+		}
+
 		Long userNo = authUser.getNo();
-		Long no = Long.parseLong(request.getParameter("no"));
-		BoardVo boardVo = new BoardDao().findByPost(userNo, no);
 		
-		if(userNo != boardVo.getUserNo() || "Y".equals(boardVo.getDeleteFlag())) {
+		BoardVo boardVo = new BoardDao().findByPost(Long.parseLong(no));
+		
+		if(boardVo == null) {
+			MvcUtils.redirect(request.getContextPath() + "/board", request, response);
+			return;
+		} else if(userNo != boardVo.getUserNo()) {
 			MvcUtils.redirect(request.getContextPath() + "/board", request, response);
 			return;
 		}

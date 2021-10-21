@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.douzone.mysite.dao.BoardDao;
+import com.douzone.mysite.vo.BoardVo;
 import com.douzone.mysite.vo.UserVo;
 import com.douzone.web.mvc.Action;
 import com.douzone.web.util.MvcUtils;
@@ -22,8 +24,25 @@ public class DeleteFormAction implements Action {
 			return;
 		}
 		
-//		String no = request.getParameter("no");
-//		request.setAttribute("no", no);
+		String no = request.getParameter("no");
+		boolean isNumeric = no.matches("^\\d+?");
+		if (!isNumeric) {
+			MvcUtils.redirect(request.getContextPath()+"/board", request, response);
+			return;
+		}
+		
+		Long userNo = authUser.getNo();
+		
+		BoardVo boardVo = new BoardDao().findByPost(Long.parseLong(no));
+		
+		if(boardVo == null) {
+			MvcUtils.redirect(request.getContextPath() + "/board", request, response);
+			return;
+		} else if(userNo != boardVo.getUserNo()) {
+			MvcUtils.redirect(request.getContextPath() + "/board", request, response);
+			return;
+		}
+		request.setAttribute("no", no);
 		
 		MvcUtils.forward("board/deleteform", request, response);
 	}

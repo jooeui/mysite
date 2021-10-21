@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,66 +32,6 @@ public class BoardDao {
 		return conn;
 	}
 	
-	public List<BoardVo> findAll(){
-		List<BoardVo> result = new ArrayList<>();
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		try {
-			conn = getConnection();
-			
-			String sql = "select b.no, b.title, b.hit, " +
-						 "if(curdate() = date_format(reg_date, '%Y-%m-%d'), "
-						 	+ " date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d')), " + 
-						" b.group_no, b.order_no, b.depth, u.name" + 
-						" from board b, user u " + 
-						" where b.user_no = u.no " + 
-						" order by b.group_no desc, b.order_no asc ";
-			pstmt = conn.prepareStatement(sql);
-			
-			rs = pstmt.executeQuery();
-			while(rs.next()) {
-				Long no = rs.getLong(1);
-				String title = rs.getString(2);
-				Long hit = rs.getLong(3);
-				String regDate = rs.getString(4);
-				Long groupNo = rs.getLong(5);
-				Long orderNo = rs.getLong(6);
-				Long depth = rs.getLong(7);
-				String writer = rs.getString(8);
-				
-				BoardVo vo = new BoardVo();
-				vo.setNo(no);
-				vo.setTitle(title);
-				vo.setHit(hit);
-				vo.setRegDate(regDate);
-				vo.setGroupNo(groupNo);
-				vo.setOrderNo(orderNo);
-				vo.setDepth(depth);
-				vo.setWriter(writer);
-				
-				result.add(vo);
-			}
-		} catch (SQLException e) {
-			System.out.println("error: " + e);
-		} finally {
-			try {
-				if (pstmt != null) {
-					pstmt.close();
-				}
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return result;
-	}
-	
 	public Long countAll() {
 		Long count = 0L;
 		
@@ -102,15 +43,18 @@ public class BoardDao {
 			conn = getConnection();
 			
 			String sql = "select count(*) from board " + 
-						" where no not in (select b.no " + 
-						"				   from board b, " + 
-						"						(select group_no, count(*) as count " + 
-						"					     from board " + 
-						"						 group by group_no) b2 " + 
-						"				   where b.group_no = b2.group_no " + 
-						"					  and order_no = 0 " + 
-						"					  and delete_flag = 'Y' " + 
-						"					  and b2.count = 1)";
+					 "	  where no not in (select b.no " + 
+					 "					   from board b, " +
+					 "							(select group_no, count(*) as count " + 
+					 "							from board " + 
+					 "							group by group_no) b2, " + 
+					 "							(select group_no, count(*) as count " + 
+					 "							from board " + 
+					 "							where delete_flag='Y' " + 
+					 "							group by group_no) b3 " + 
+					 "						where b.group_no = b2.group_no " + 
+					 "							and b2.group_no = b3.group_no " + 
+					 "							and b2.count = b3.count) ";
 			pstmt = conn.prepareStatement(sql);
 			
 			rs = pstmt.executeQuery();
@@ -134,54 +78,6 @@ public class BoardDao {
 		
 		return count;
 	}
-	
-	public BoardVo findByTitleAndContent(Long no) {
-		BoardVo boardVo = null;
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		try {
-			conn = getConnection();
-			
-			String selectPost = "select no, title, content, user_no, delete_flag " + 
-								" from board where no=?";
-			pstmt = conn.prepareStatement(selectPost);
-			pstmt.setLong(1, no);
-			
-			rs = pstmt.executeQuery();
-			while(rs.next()) {
-				Long pNo = rs.getLong(1);
-				String title = rs.getString(2);
-				String content = rs.getString(3);
-				Long userNo = rs.getLong(4);
-				String deleteFlag = rs.getString(5);
-				
-				boardVo = new BoardVo();
-				boardVo.setNo(pNo);
-				boardVo.setTitle(title);
-				boardVo.setContent(content);
-				boardVo.setUserNo(userNo);
-				boardVo.setDeleteFlag(deleteFlag);
-			}
-		} catch (SQLException e) {
-			System.out.println("error: " + e);
-		} finally {
-			try {
-				if (pstmt != null) {
-					pstmt.close();
-				}
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return boardVo;
-	}
 
 	public boolean hitUpdate(Long no) {
 		boolean result = false;
@@ -192,7 +88,7 @@ public class BoardDao {
 		try {
 			conn = getConnection();
 			
-			String hitUpdate = "update board set hit=hit+1 where no=?";
+			String hitUpdate = "update board set hit=hit+1 where no=? ";
 			pstmt = conn.prepareStatement(hitUpdate);
 			pstmt.setLong(1, no);
 			int count = pstmt.executeUpdate();
@@ -215,25 +111,29 @@ public class BoardDao {
 		return result;
 	}
 
-	public boolean write(BoardVo vo) {
-		boolean result = false;
+	public Long write(BoardVo vo) {
+		Long no = 0L;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
+		ResultSet rs = null;
 		
 		try {
 			conn = getConnection();
 			
 			String sql = "insert into board " + 
 						" values(null, ?, ?, default, now(), ifnull((select max(group_no) from board b), 0)+1, 0, 0, ?, default) ";
-			pstmt = conn.prepareStatement(sql);
+			pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			
 			pstmt.setString(1, vo.getTitle());
 			pstmt.setString(2, vo.getContent());
 			pstmt.setLong(3, vo.getUserNo());
 			
-			int count = pstmt.executeUpdate();
+			pstmt.executeUpdate();
 			
-			result = count == 1;
+			rs = pstmt.getGeneratedKeys();
+			while(rs.next()) {
+				no = rs.getLong(1);
+			}
 		} catch (SQLException e) {
 			System.out.println("error: " + e);
 		} finally {
@@ -248,10 +148,10 @@ public class BoardDao {
 				e.printStackTrace();
 			}
 		}
-		return result;
+		return no;
 	}
 	
-	public BoardVo findByPost(Long userNo, Long no) {
+	public BoardVo findByPost(Long no) {
 		BoardVo boardVo = null;
 		
 		Connection conn = null;
@@ -261,8 +161,8 @@ public class BoardDao {
 		try {
 			conn = getConnection();
 			
-			String sql = "select no, title, content, group_no, order_no, depth, user_no, delete_flag " + 
-						" from board where no=?";
+			String sql = "select no, title, content, user_no " + 
+						" from board where no=? and delete_flag='N'";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setLong(1, no);
 			
@@ -271,21 +171,13 @@ public class BoardDao {
 				Long pNo = rs.getLong(1);
 				String title = rs.getString(2);
 				String content = rs.getString(3);
-				Long groupNo = rs.getLong(4);
-				Long orderNo = rs.getLong(5);
-				Long depth = rs.getLong(6);
-				Long uNo = rs.getLong(7);
-				String deleteFlag = rs.getString(8);
+				Long userNo = rs.getLong(4);
 				
 				boardVo = new BoardVo();
 				boardVo.setNo(pNo);
 				boardVo.setTitle(title);
 				boardVo.setContent(content);
-				boardVo.setGroupNo(groupNo);
-				boardVo.setOrderNo(orderNo);
-				boardVo.setDepth(depth);
-				boardVo.setUserNo(uNo);
-				boardVo.setDeleteFlag(deleteFlag);
+				boardVo.setUserNo(userNo);
 			}
 		} catch (SQLException e) {
 			System.out.println("error: " + e);
@@ -351,7 +243,7 @@ public class BoardDao {
 			conn = getConnection();
 			
 			String sql = "select no, group_no, order_no, depth" + 
-						" from board where no=?";
+						" from board where no=? and delete_flag='N'";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setLong(1, no);
 			
@@ -473,15 +365,18 @@ public class BoardDao {
 						 " b.group_no, b.order_no, b.depth, u.name, b.user_no, b.delete_flag " + 
 						 " from board b, user u " + 
 						 " where b.user_no = u.no " + 
-						 "	  and b.no not in (select b.no " +
+						 "	  and b.no not in (select b.no " + 
 						 "					   from board b, " +
-						 "							(select group_no, count(*) as count" +
-						 "							 from board " + 
-						 "						     group by group_no) b2 " + 
-						 "					   where b.group_no = b2.group_no " +
-						 "						  and order_no = 0 " +
-						 "						  and delete_flag = 'Y' " +
-						 "						  and b2.count = 1) " +
+						 "							(select group_no, count(*) as count " + 
+						 "							from board " + 
+						 "							group by group_no) b2, " + 
+						 "							(select group_no, count(*) as count " + 
+						 "							from board " + 
+						 "							where delete_flag='Y' " + 
+						 "							group by group_no) b3 " + 
+						 "						where b.group_no = b2.group_no " + 
+						 "							and b2.group_no = b3.group_no " + 
+						 "							and b2.count = b3.count) " +
 						 " order by b.group_no desc, b.order_no asc " + 
 						 " limit ?, ?";
 			pstmt = conn.prepareStatement(sql);
@@ -624,7 +519,7 @@ public class BoardDao {
 			String sql = "select b.no, b.title, b.hit, " +
 						 "if(curdate() = date_format(reg_date, '%Y-%m-%d'), "
 						 	+ " date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d')), " + 
-						" b.group_no, b.order_no, b.depth, u.name, b.user_no, b.delete_flag " + 
+						" b.group_no, b.order_no, b.depth, u.name, b.user_no " + 
 						" from board b, user u " + 
 						" where b.user_no = u.no " + 
 						"	and title like ?" +
@@ -647,8 +542,6 @@ public class BoardDao {
 				Long depth = rs.getLong(7);
 				String writer = rs.getString(8);
 				Long userNo = rs.getLong(9);
-				String deleteFlag = rs.getString(10);
-				
 				
 				BoardVo vo = new BoardVo();
 				vo.setNo(no);
@@ -660,7 +553,6 @@ public class BoardDao {
 				vo.setDepth(depth);
 				vo.setWriter(writer);
 				vo.setUserNo(userNo);
-				vo.setDeleteFlag(deleteFlag);
 				
 				result.add(vo);
 			}

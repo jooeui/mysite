@@ -57,6 +57,9 @@
 								</c:when>
 								<c:otherwise>
 									<td style="text-align: left; padding-left: ${20*vo.depth}px">
+										<c:if test="${vo.depth > 0 }">
+											<img src="${pageContext.servletContext.contextPath }/assets/images/reply.png">
+										</c:if>
 										삭제된 게시글입니다.
 									</td>
 									<td>-</td>

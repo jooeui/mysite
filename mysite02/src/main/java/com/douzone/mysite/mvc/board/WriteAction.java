@@ -38,8 +38,13 @@ public class WriteAction implements Action {
 		vo.setContent(content);
 		vo.setUserNo(userNo);
 		
-		new BoardDao().write(vo);
-		MvcUtils.redirect(request.getContextPath() + "/board", request, response);
+		Long getNo = new BoardDao().write(vo);
+		if(getNo < 1) {
+			MvcUtils.redirect(request.getContextPath()+"/board", request, response);
+			return;
+		}
+		
+		MvcUtils.redirect(request.getContextPath() + "/board?a=view&no=" + getNo, request, response);
 		
 	}
 
