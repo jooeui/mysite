@@ -21,8 +21,8 @@ public class GuestbookService {
 		guestbookRepository.insert(vo);
 	}
 
-	public void delete(Long no, String password) {
-		guestbookRepository.delete(no, password);
+	public void delete(GuestbookVo vo) {
+		guestbookRepository.delete(vo);
 	}
 	
 }

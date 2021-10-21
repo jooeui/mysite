@@ -8,10 +8,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import com.douzone.mysite.vo.GuestbookVo;
 import com.douzone.mysite.service.GuestbookService;
+import com.douzone.mysite.vo.GuestbookVo;
 
 @Controller
 @RequestMapping("/guestbook")
@@ -39,8 +38,8 @@ public class GuestbookController {
 	}
 	
 	@RequestMapping(value="/delete/{no}", method=RequestMethod.POST)
-	public String delete(@PathVariable("no") Long no, @RequestParam(value="password", required=true, defaultValue="") String password) {
-		guestbookService.delete(no, password);
+	public String delete(GuestbookVo vo) {
+		guestbookService.delete(vo);
 		return "redirect:/guestbook";
 	}
 }

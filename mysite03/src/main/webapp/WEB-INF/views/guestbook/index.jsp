@@ -22,7 +22,7 @@
 							<td>비밀번호</td><td><input type="password" name="password"></td>
 						</tr>
 						<tr>
-							<td colspan=4><textarea name="content" id="content"></textarea></td>
+							<td colspan=4><textarea name="message" id="content"></textarea></td>
 						</tr>
 						<tr>
 							<td colspan=4 align=right><input type="submit" VALUE=" 확인 "></td>
@@ -42,7 +42,7 @@
 								</tr>
 								<tr>
 									<td colspan=4>
-										${fn:replace(vo.content, newline, "<br/>") }
+										${fn:replace(vo.message, newline, "<br/>") }
 									</td>
 								</tr>
 							</table>
