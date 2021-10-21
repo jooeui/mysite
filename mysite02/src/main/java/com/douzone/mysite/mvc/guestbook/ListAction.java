@@ -26,7 +26,7 @@ public class ListAction implements Action {
 		
 		boolean isNumeric = sp.matches("^\\d+?");
 		if (!isNumeric) {
-			MvcUtils.redirect(request.getContextPath()+"/board", request, response);
+			MvcUtils.redirect(request.getContextPath()+"/guestbook", request, response);
 			return;
 		}
 		request.setAttribute("sp", sp);
@@ -40,7 +40,7 @@ public class ListAction implements Action {
 		
 		Long lastPage = (count-1)/limitCount + 1;
 		if(selectPage > lastPage || selectPage < 1) {	
-			MvcUtils.redirect(request.getContextPath()+"/board", request, response);
+			MvcUtils.redirect(request.getContextPath()+"/guestbook", request, response);
 			return;
 		}
 		request.setAttribute("count", count);

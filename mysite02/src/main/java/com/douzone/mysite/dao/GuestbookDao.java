@@ -170,6 +170,45 @@ public class GuestbookDao {
 		return result;
 	}
 	
+	public boolean findByPost(long no) {
+		boolean result = false;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			
+			String sql = "select count(*) as count from guestbook" + 
+						" where no = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, no);
+			
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				Long count = rs.getLong(1);
+					
+				result = count > 0 ;
+			}
+		} catch (SQLException e) {
+			System.out.println("error: " + e);
+		} finally {
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
 	private Connection getConnection() throws SQLException {
 		Connection conn = null;
 
@@ -184,4 +223,5 @@ public class GuestbookDao {
 
 		return conn;
 	}
+
 }
