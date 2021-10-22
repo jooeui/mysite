@@ -10,19 +10,24 @@
 
 	<insert id="insert" parameterType="uservo" >
 		<![CDATA[
-		insert into user values(null, #{name }, #{email }, #{password }, #{gender }, now())
+		insert into user 
+		values(null, #{name }, #{email }, #{password }, #{gender }, now(), 'USER')
 		]]>
 	</insert>
 	
 	<select id="findByEmailAndPassword" parameterType="map" resultType="uservo">
 		<![CDATA[
-		select no, name from user where email=#{e } and password=#{p }
+		select no, name, role
+		from user 
+		where email=#{e } and password=#{p }
 		]]>
 	</select>
 	
 	<select id="findByNo" parameterType="long" resultType="uservo">
 		<![CDATA[
-		select no, name, email, gender from user where no=#{no }
+		select no, name, email, gender 
+		from user 
+		where no=#{no }
 		]]>
 	</select>
 
