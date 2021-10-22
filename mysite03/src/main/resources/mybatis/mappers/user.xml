@@ -4,7 +4,7 @@
 <mapper namespace="user">
 	<update id="update" parameterType="uservo" >
 		<![CDATA[
-		update user set gender=${gender } where no=${no }
+		update user set name=#{name }, gender=#{gender } where no=#{no }
 		]]>
 	</update>
 
