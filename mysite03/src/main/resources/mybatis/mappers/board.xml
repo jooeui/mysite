@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+<resultMap type="boardvo" id="resultMapList">
+	<result column="no" property="no" />
+	<result column="reg_date" property="regDate" />
+	<result column="group_no" property="groupNo" />
+	<result column="order_no" property="orderNo" />
+	<result column="name" property="userName" />
+	<result column="user_no" property="userNo" />
+	<result column="delete_flag" property="deleteFlag" />
+</resultMap>
+	<select id="countAll" resultType="long">
+		<![CDATA[
+		select count(*) 
+		  from board
+		 where no not in (select b.no
+						    from board b,
+					 		  	(select group_no, count(*) as count
+					 			   from board
+					 		   group by group_no) b2, 
+					 		    (select group_no, count(*) as count
+					 			   from board
+					 			  where delete_flag='Y'
+							   group by group_no) b3
+						   where b.group_no = b2.group_no
+					 		 and b2.group_no = b3.group_no
+					 		 and b2.count = b3.count)
+		]]>
+	</select>
+	
+	<select id="findPrintList" resultMap="resultMapList" parameterType="hashmap" resultType="boardvo">
+		<![CDATA[
+		select b.no, b.title, b.hit,
+			   if(curdate() = date_format(reg_date, '%Y-%m-%d'),
+			         date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d')) as reg_date,
+			   b.group_no, b.order_no, b.depth, u.name, b.user_no, b.delete_flag
+		from board b, user u
+		where b.user_no = u.no
+			and b.no not in (select b.no
+						 	 from board b,
+						 		  (select group_no, count(*) as count
+						           from board 
+								   group by group_no) b2,
+								  (select group_no, count(*) as count
+						 		   from board
+						 		   where delete_flag='Y'
+						 		   group by group_no) b3
+						 	  where b.group_no = b2.group_no
+						 		and b2.group_no = b3.group_no
+						 		and b2.count = b3.count)
+		order by b.group_no desc, b.order_no asc
+		limit #{listlimit }, #{limitcount }
+		]]>
+	</select>
+	
+	<select id="findByPost" parameterType="long" resultType="boardvo">
+		<![CDATA[
+		select no, title, content, user_no
+		from board where no=#{no } and delete_flag='N'
+		]]>
+	</select>
+	
+	<update id="hitUpdate" parameterType="long">
+		<![CDATA[
+		update board set hit=hit+1 where no=#{no } and delete_flag='N'
+		]]>
+	</update>
+	
+	<select id="findByParentBoardInfo" resultMap="resultMapList" parameterType="long" resultType="boardvo">
+		<![CDATA[
+		select no, group_no, order_no, depth
+		from board 
+		where no=#{no } and delete_flag='N'
+		]]>
+	</select>
+	
+	<update id="orderNoUpdate" parameterType="boardvo">
+		<![CDATA[
+		update board 
+		set order_no = order_no + 1 
+		where group_no = #{groupNo }
+			and order_no > #{orderNo }
+		]]>
+	</update> 
+	
+	<insert id="write" parameterType="boardvo">
+		<![CDATA[
+		insert into board
+		values(null, #{title }, #{content}, default, now(), 
+		]]>
+		<choose>
+			<when test="no == null">
+			<![CDATA[ ifnull((select max(group_no) from board b), 0)+1, 0, 0, ]]>
+			</when>
+			<otherwise>
+			<![CDATA[ #{groupNo }, #{orderNo }+1, #{depth }+1, ]]>
+			</otherwise>
+		</choose>
+		<![CDATA[ #{userNo }, default) ]]>
+		<selectKey keyProperty="no" resultType="long" order="AFTER">
+			<![CDATA[ select last_insert_id() ]]>
+		</selectKey>
+	</insert> 
+</mapper>

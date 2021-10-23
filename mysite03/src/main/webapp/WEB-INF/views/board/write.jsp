@@ -14,22 +14,20 @@
 		<c:import url="/WEB-INF/views/includes/header.jsp" />
 		<div id="content">
 			<div id="board">
-				<form class="board-form" method="post" action="${pageContext.servletContext.contextPath }/board">
-					<c:choose>
-						<c:when test="${empty param.no }">
-							<input type="hidden" name="a" value="write">
-						</c:when>
-						<c:otherwise>
-							<input type="hidden" name="a" value="reply">
-							<input type="hidden" name="no" value="${param.no }">
-						</c:otherwise>
-					</c:choose>
-					
+				<c:choose>
+					<c:when test="${empty no }">
+						<c:set var="writePath" value="/board/write" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="writePath" value="/board/write/${no }" />
+					</c:otherwise>
+				</c:choose>
+				<form class="board-form" method="post" action="${pageContext.servletContext.contextPath }${writePath }">
 					<table class="tbl-ex">
 						<tr>
 							<th colspan="2">
 							<c:choose>
-								<c:when test="${empty param.no }">
+								<c:when test="${empty no }">
 									글쓰기
 								</c:when>
 								<c:otherwise>
@@ -40,15 +38,27 @@
 						</tr>
 						<tr>
 							<td class="label">제목</td>
-							<td><input type="text" name="title" value=""></td>
+							<td><input type="text" name="title" value="${boardVo.title }"></td>
 						</tr>
 						<tr>
 							<td class="label">내용</td>
 							<td>
-								<textarea id="content" name="content"></textarea>
+								<textarea id="content" name="content">${boardVo.content }</textarea>
 							</td>
 						</tr>
 					</table>
+					<c:choose>
+						<c:when test='${result == "emptyTitle" }'>
+							<p>
+								제목을 입력해주세요.
+							</p>
+						</c:when>
+						<c:when test='${result == "emptyContent" }'>
+							<p>
+								내용을 입력해주세요.
+							</p>
+						</c:when>
+					</c:choose>
 					<div class="bottom">
 						<a href="${pageContext.servletContext.contextPath }/board">취소</a>
 						<input type="submit" value="등록">

@@ -35,16 +35,9 @@
 				<div class="bottom">
 					<a href="${pageContext.servletContext.contextPath }/board">글목록</a>
 					<c:if test='${authUser.no == boardVo.userNo }'>
-						<a href="${pageContext.servletContext.contextPath }/board?a=modifyform&no=${boardVo.no }">글수정</a>
+						<a href="${pageContext.servletContext.contextPath }/board/modify/${boardVo.no }">글수정</a>
 					</c:if>
-					<c:choose>
-						<c:when test="${empty authUser }">
-							<a href="${pageContext.servletContext.contextPath }/user?a=loginform" target="_blank">답글</a>
-						</c:when>
-						<c:otherwise>
-							<a href="${pageContext.servletContext.contextPath }/board?a=writeform&no=${boardVo.no }">답글</a>
-						</c:otherwise>
-					</c:choose>					
+					<a href="${pageContext.servletContext.contextPath }/board/write/${boardVo.no }">답글</a>
 				</div>
 			</div>
 		</div>
