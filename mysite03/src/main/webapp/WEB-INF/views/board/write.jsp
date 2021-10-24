@@ -15,14 +15,14 @@
 		<div id="content">
 			<div id="board">
 				<c:choose>
-					<c:when test="${empty no }">
-						<c:set var="writePath" value="/board/write" />
+					<c:when test="${not empty no }">
+						<c:set var="writePath" value="/${no }" />
 					</c:when>
 					<c:otherwise>
-						<c:set var="writePath" value="/board/write/${no }" />
+						<c:set var="writePath" value="" />
 					</c:otherwise>
 				</c:choose>
-				<form class="board-form" method="post" action="${pageContext.servletContext.contextPath }${writePath }">
+				<form class="board-form" method="post" action="${pageContext.servletContext.contextPath }/board/write${writePath }">
 					<table class="tbl-ex">
 						<tr>
 							<th colspan="2">

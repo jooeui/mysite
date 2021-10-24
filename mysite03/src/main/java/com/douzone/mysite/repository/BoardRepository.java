@@ -17,15 +17,21 @@ public class BoardRepository {
 	@Autowired
 	private SqlSession sqlSession;
 	
-	public Long countAll() {
-		return sqlSession.selectOne("board.countAll");
+	public Long countAll(String searchType, String keyword) {
+		Map<String, String> map = new HashMap<>();
+		map.put("searchType", searchType);
+		map.put("keyword", keyword);
+		return sqlSession.selectOne("board.countAll", map);
 	}
 	
-	public List<BoardVo> findPrintList(int listLimit, int limitCount) {
-		Map<String, Integer> map = new HashMap<>();
+	public List<BoardVo> findPrintList(String searchType, String keyword, int listLimit, int limitCount) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("searchType", searchType);
+		map.put("keyword", keyword);
 		map.put("listlimit", listLimit);
 		map.put("limitcount", limitCount);
-		
+//		System.out.println("map = " + map);
+//		System.out.println("keyword" + map.get("keyword").getClass());
 		return sqlSession.selectList("board.findPrintList", map);
 	}
 	
@@ -44,42 +50,6 @@ public class BoardRepository {
 		return postNo;
 	}
 
-//	public boolean update(BoardVo vo) {
-//		boolean result = false;
-//		Connection conn = null;
-//		PreparedStatement pstmt = null;
-//		
-//		try {
-//			conn = getConnection();
-//			String sql = " update board set title=?, content=? where no=? and user_no=?";
-//			pstmt = conn.prepareStatement(sql);
-//			
-//			pstmt.setString(1, vo.getTitle());
-//			pstmt.setString(2, vo.getContent());
-//			pstmt.setLong(3, vo.getNo());
-//			pstmt.setLong(4, vo.getUserNo());
-//			
-//			int count = pstmt.executeUpdate();
-//			
-//			result = count == 1;
-//		} catch(SQLException e) {
-//			System.out.println("error: " + e);
-//		} finally {
-//			// clean up
-//			try {
-//				if (pstmt != null) {
-//					pstmt.close();
-//				}
-//				if (conn != null) {
-//					conn.close();
-//				}
-//			} catch (SQLException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		return result;
-//	}
-//
 	public BoardVo findByParentBoardInfo(Long no) {
 		return sqlSession.selectOne("board.findByParentBoardInfo", no);
 	}
@@ -88,85 +58,35 @@ public class BoardRepository {
 		int count = sqlSession.update("board.orderNoUpdate", boardVo);
 		return count == 1;
 	}
+	
+	public BoardVo findByPostInfo(Long no, Long userNo) {
+		Map<String, Long> map = new HashMap<>();
+		map.put("no", no);
+		map.put("userNo", userNo);
+		return sqlSession.selectOne("board.findByEditPostInfo", map);
+	}
+	
+	public boolean update(BoardVo boardVo) {
+		int count = sqlSession.update("board.postUpdate", boardVo);
+		return count == 1;
+	}
 
+	public boolean delete(Long no, Long userNo, String password) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("no", no);
+		map.put("userNo", userNo);
+		map.put("password", password);
+		
+		int count = sqlSession.delete("board.deletePost", map);
+		return count == 1;
+			
+	}
 
-//	public boolean delete(BoardVo vo, String pw) {
-//		boolean result = false;
-//		Connection conn = null;
-//		String sql = null;
-//		PreparedStatement pstmt = null;
-//		
-//		try {
-//			conn = getConnection();
-//			
-//			sql = "update board set delete_flag='Y' " + 
-//				 " where no=? and user_no=? " + 
-//					" and if((select count(*) from user where no=? and password=?) = 1, true, false) ";
-//			pstmt = conn.prepareStatement(sql);
-//			pstmt.setLong(1, vo.getNo());
-//			pstmt.setLong(2, vo.getUserNo());
-//			pstmt.setLong(3, vo.getUserNo());
-//			pstmt.setString(4, pw);
-//			
-//			int count = pstmt.executeUpdate();
-//			
-//			result = count == 1;
-//		} catch (SQLException e) {
-//			System.out.println("error: " + e);
-//		} finally {
-//			try {
-//				if (pstmt != null) {
-//					pstmt.close();
-//				}
-//				if (conn != null) {
-//					conn.close();
-//				}
-//			} catch (SQLException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		return result;
-//	}
-//
 //	public Long searchCount(String kwd) {
-//		Long searchCount = 0L;
-//		
-//		Connection conn = null;
-//		PreparedStatement pstmt = null;
-//		ResultSet rs = null;
-//		
-//		try {
-//			conn = getConnection();
-//			
-//			String sql = "select count(*) from board" + 
-//						" where title like ?" +
-//						"	and delete_flag = 'n' ";
-//			pstmt = conn.prepareStatement(sql);
-//			pstmt.setString(1, "%"+kwd+"%");
-//			
-//			rs = pstmt.executeQuery();
-//			while(rs.next()) {
-//				searchCount = rs.getLong(1);
-//			}
-//		} catch (SQLException e) {
-//			System.out.println("error: " + e);
-//		} finally {
-//			try {
-//				if (pstmt != null) {
-//					pstmt.close();
-//				}
-//				if (conn != null) {
-//					conn.close();
-//				}
-//			} catch (SQLException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//
+//		Long searchCount = sqlSession.selectOne("board.searchCount", kwd);
 //		return searchCount;
 //	}
-//	
-//
+
 //	public List<BoardVo> searchPrintList(long listLimit, Long limitCount, String kwd) {
 //		List<BoardVo> result = new ArrayList<>();
 //		

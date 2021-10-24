@@ -14,10 +14,7 @@
 		<c:import url="/WEB-INF/views/includes/header.jsp" />
 		<div id="content">
 			<div id="board">
-				<form class="board-form" method="post" action="${pageContext.servletContext.contextPath }/board">
-					<input type="hidden" name="a" value="modify">
-					<input type="hidden" name="no" value="${param.no }">
-					
+				<form class="board-form" method="post" action="${pageContext.servletContext.contextPath }/board/modify/${no}">
 					<table class="tbl-ex">
 						<tr>
 							<th colspan="2">글수정</th>
@@ -33,8 +30,20 @@
 							</td>
 						</tr>
 					</table>
+					<c:choose>
+						<c:when test='${result == "emptyTitle" }'>
+							<p>
+								제목을 입력해주세요.
+							</p>
+						</c:when>
+						<c:when test='${result == "emptyContent" }'>
+							<p>
+								내용을 입력해주세요.
+							</p>
+						</c:when>
+					</c:choose>
 					<div class="bottom">
-						<a href="${pageContext.servletContext.contextPath }/board">취소</a>
+						<a href="${pageContext.servletContext.contextPath }/board/view/${no}">취소</a>
 						<input type="submit" value="수정">
 					</div>
 				</form>				

@@ -15,9 +15,7 @@
 		<div id="content">
 			<div id="guestbook" class="delete-form">
 				<p style="text-align: center; margin: 50px auto 10px;">계정 비밀번호를 입력하세요.</p>
-				<form method="post" action="${pageContext.request.contextPath }/board">
-					<input type="hidden" name="a" value="delete">
-					<input type='hidden' name="no" value="${param.no }">
+				<form method="post" action="${pageContext.request.contextPath }/board/delete/${no}">
 					<label>비밀번호</label>
 					<input type="password" name="password">
 					<input type="submit" value="확인">

@@ -33,8 +33,10 @@ public class BoardController {
 	@RequestMapping("")
 	public String index(
 			@RequestParam(value="cp", required=true, defaultValue="1") Long currentPage,
+			@RequestParam(value="st", required=true, defaultValue="") String searchType,
+			@RequestParam(value="kwd", required=true, defaultValue="") String keyword,
 			Model model) {
-		Map<String, Object> map= boardService.getBoardList(currentPage);
+		Map<String, Object> map= boardService.getBoardList(currentPage, searchType, keyword);
 		model.addAttribute("map", map);
 		return "board/index";
 	}
@@ -101,7 +103,7 @@ public class BoardController {
 		if(no != null) {
 			BoardVo parentsBoardInfo = boardService.getParentBoardInfo(no);
 			if(parentsBoardInfo == null) {
-				return "redirect:/board/view/" + no;
+				return "redirect:/board";
 			}
 			model.addAttribute("no", no);
 		}
@@ -110,9 +112,7 @@ public class BoardController {
 	
 	@Auth
 	@RequestMapping(value={"/write", "/write/{no}"}, method=RequestMethod.POST)
-	public String write(
-			@PathVariable(value="no", required=false) Long no, 
-			@AuthUser UserVo authUser, BoardVo boardVo, Model model) {
+	public String write(@AuthUser UserVo authUser, BoardVo boardVo, Model model) {
 		// 제목이나 내용을 입력하지 않을 경우 작성 되지 않는다
 		if("".equals(boardVo.getTitle())) {
 			model.addAttribute("boardVo", boardVo);
@@ -123,13 +123,65 @@ public class BoardController {
 			model.addAttribute("result", "emptyContent");
 			return "/board/write";
 		}
-		if(no != null) {
-			boardVo.setNo(no);	// 번호가 넘어온 경우 답글이므로 답글을 달 게시글 번호를 vo에 set
-		}
 		boardVo.setUserNo(authUser.getNo());	// vo에 유저 번호 set
 		
 		Long postNo = boardService.addPost(boardVo);	// 게시글 작성 후 작성된 게시글의 번호를 받아옴
 		
 		return "redirect:/board/view/" + postNo;
+	}
+	
+	@Auth
+	@RequestMapping(value="/modify/{no}", method=RequestMethod.GET)
+	public String modify(
+			@PathVariable("no") Long no, @AuthUser UserVo authUser, Model model) {
+		BoardVo editPostInfo = boardService.getEditPostInfo(no, authUser.getNo());
+		if(editPostInfo == null) {
+			return "redirect:/board";
+		}
+		
+		model.addAttribute(editPostInfo);
+		return "board/modify";
+	}
+	
+	@Auth
+	@RequestMapping(value="/modify/{no}", method=RequestMethod.POST)
+	public String modify(@AuthUser UserVo authUser, BoardVo boardVo, Model model) {
+		if("".equals(boardVo.getTitle())) {
+			model.addAttribute("boardVo", boardVo);
+			model.addAttribute("result", "emptyTitle");
+			return "/board/modify";
+		} else if ("".equals(boardVo.getContent())) {
+			model.addAttribute("boardVo", boardVo);
+			model.addAttribute("result", "emptyContent");
+			return "/board/modify";
+		}
+		boardVo.setUserNo(authUser.getNo());
+		
+		boardService.editPost(boardVo);
+		
+		return "redirect:/board/view/" + boardVo.getNo();
+	}
+	
+	@Auth
+	@RequestMapping(value="/delete/{no}", method=RequestMethod.GET)
+	public String delete(
+			@PathVariable("no") Long no, @AuthUser UserVo authUser, Model model) {
+		BoardVo deletePostInfo = boardService.getDeletePostInfo(no, authUser.getNo());
+		if(deletePostInfo == null) {
+			return "redirect:/board";
+		}
+		model.addAttribute("no", no);
+		return "/board/delete";
+	}
+	
+	@Auth
+	@RequestMapping(value="/delete/{no}", method=RequestMethod.POST)
+	public String delete(
+			@PathVariable("no") Long no,
+			@RequestParam(value="password", required=true, defaultValue="") String password,
+			@AuthUser UserVo authUser) {
+		boardService.deletePost(no, authUser.getNo(), password);
+		
+		return "redirect:/board";
 	}
 }

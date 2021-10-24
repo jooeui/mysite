@@ -14,7 +14,12 @@
 		<c:import url="/WEB-INF/views/includes/header.jsp"/>
 		<div id="content">
 			<div id="board">
-				<form id="search_form" action="${pageContext.servletContext.contextPath }/board/search" method="post">
+				<form id="search_form" action="${pageContext.servletContext.contextPath }/board" method="post">
+					<select name="st" >
+						<option value="title" >제목</option>
+						<option value="content">내용</option>
+						<option value="writer">글쓴이</option>
+					</select>
 					<input type="text" id="kwd" name="kwd" value="">
 					<input type="submit" value="찾기">
 				</form>
@@ -47,10 +52,8 @@
 									<td>${vo.hit }</td>
 									<td>${vo.regDate }</td>
 									<td>
-										<c:if test="${authUser.no eq vo.userNo }" >
-											<a href="${pageContext.servletContext.contextPath }/board/delete/${vo.no}" class="del">
-												<img src="${pageContext.servletContext.contextPath }/assets/images/recycle.png">
-											</a>
+										<c:if test="${authUser.no == vo.userNo }" >
+											<a href="${pageContext.servletContext.contextPath }/board/delete/${vo.no}" class="del"></a>
 										</c:if>
 									</td>
 								</c:when>
@@ -81,7 +84,7 @@
 								<li>◀</li>
 							</c:when>
 							<c:otherwise>
-								<li><a href="${pageContext.servletContext.contextPath }/board?cp=${map.currentPage-1 }">◀</a></li>
+								<li><a href="${pageContext.servletContext.contextPath }/board?cp=${map.currentPage-1 }&st=${map.st}&kwd=${map.kwd}">◀</a></li>
 							</c:otherwise>
 						</c:choose>
 						
@@ -95,7 +98,7 @@
 									<li>${pager }</li>
 								</c:when>
 								<c:otherwise>
-									<li><a href="${pageContext.servletContext.contextPath }/board?cp=${pager }">${pager }</a></li>
+									<li><a href="${pageContext.servletContext.contextPath }/board?cp=${pager }&st=${map.st}&kwd=${map.kwd}">${pager }</a></li>
 								</c:otherwise>
 							</c:choose>
 						</c:forEach>
@@ -104,7 +107,7 @@
 								만약 현재 페이지가 마지막 페이지(lastPage)라면 다음 페이지 이동 화살표 안 뜨게 --%>
 						<c:choose>
 							<c:when test="${map.currentPage != map.lastPage }">
-								<li><a href="${pageContext.servletContext.contextPath }/board?cp=${map.currentPage+1 }">▶</a></li>
+								<li><a href="${pageContext.servletContext.contextPath }/board?cp=${map.currentPage+1 }&st=${map.st}&kwd=${map.kwd}">▶</a></li>
 							</c:when>
 							<c:otherwise>
 								<li>▶</li>

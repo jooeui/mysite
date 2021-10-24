@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +17,21 @@ import com.douzone.mysite.vo.BoardVo;
 
 @Service
 public class BoardService {
-	private static final int LIMIT_COUNT = 5; 		// 한 페이지 당 출력할 게시글 수
+	private static final int LIMIT_COUNT = 10; 		// 한 페이지 당 출력할 게시글 수
 	private static final String COOKIE_NAME = "viewCookie";		// 쿠키 이름
 	
 	@Autowired
 	private BoardRepository boardRepository;
 
-	public Map<String, Object> getBoardList(Long currentPage) {
-		Long count = boardRepository.countAll();	// 전체 게시글 수
+	public Map<String, Object> getBoardList(Long currentPage, String searchType, String keyword) {
+//		Long count = 0L;
+//		if("".equals(keyword)) {
+//			count = boardRepository.countAll();	// 전체 게시글 수
+//		} else {
+//			count = boardRepository.searchCount(keyword)
+//		}
+		
+		Long count = boardRepository.countAll(searchType, keyword);		// 전체 게시글 수
 //		System.out.println(count);
 		Long lastPage = (count-1)/LIMIT_COUNT + 1;	// 게시판 끝 번호
 		Long startPage = 0L;	// 페이징 시작 번호
@@ -44,9 +52,11 @@ public class BoardService {
 		int listLimit = (int)((currentPage-1)*LIMIT_COUNT);
 		// 출력할 게시글 리스트
 		
-		List<BoardVo> printList = boardRepository.findPrintList(listLimit, LIMIT_COUNT);
+		List<BoardVo> printList = boardRepository.findPrintList(searchType, keyword, listLimit, LIMIT_COUNT);
 		
 		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("st", searchType);
+		map.put("kwd", keyword);
 		map.put("printList", printList);
 //		System.out.println("게시글 - " + printList);
 		map.put("count", count);
@@ -83,5 +93,21 @@ public class BoardService {
 		}
 		
 		return boardRepository.write(boardVo);
+	}
+
+	public BoardVo getEditPostInfo(Long no, Long userNo) {
+		return boardRepository.findByPostInfo(no, userNo);
+	}
+
+	public void editPost(BoardVo boardVo) {
+		boardRepository.update(boardVo);
+	}
+
+	public BoardVo getDeletePostInfo(Long no, Long userNo) {
+		return boardRepository.findByPostInfo(no, userNo);
+	}
+
+	public void deletePost(Long no, Long userNo, String password) {
+		boardRepository.delete(no, userNo, password);
 	}
 }
