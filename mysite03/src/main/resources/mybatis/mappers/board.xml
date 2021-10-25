@@ -158,12 +158,20 @@
 	</update>
 	
 	<update id="deletePost" parameterType="map" >
+		<!-- 
 		<![CDATA[
 		update board 
 		set delete_flag = 'Y'
 		where no=#{no } and user_no=#{userNo }
 		and if( ( select count(*) from user where no=#{userNo } and password=#{password } )
 					 = 1, true, false )
+		]]>
+		 -->
+		<![CDATA[
+		update board 
+		set delete_flag = 'Y'
+		where no=#{no } and user_no=#{userNo }
+		and if( (select count(*) from user where no=#{userNo }) = 1, true, false )
 		]]>
 	</update>
 </mapper>

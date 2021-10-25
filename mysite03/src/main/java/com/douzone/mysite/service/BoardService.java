@@ -1,14 +1,9 @@
 package com.douzone.mysite.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
-
-import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +13,6 @@ import com.douzone.mysite.vo.BoardVo;
 @Service
 public class BoardService {
 	private static final int LIMIT_COUNT = 10; 		// 한 페이지 당 출력할 게시글 수
-	private static final String COOKIE_NAME = "viewCookie";		// 쿠키 이름
 	
 	@Autowired
 	private BoardRepository boardRepository;
@@ -54,14 +48,14 @@ public class BoardService {
 		
 		List<BoardVo> printList = boardRepository.findPrintList(searchType, keyword, listLimit, LIMIT_COUNT);
 		
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("st", searchType);
 		map.put("kwd", keyword);
 		map.put("printList", printList);
 //		System.out.println("게시글 - " + printList);
 		map.put("count", count);
 		map.put("limitCount", LIMIT_COUNT);
-		map.put("currentPage", currentPage);
+		map.put("cp", currentPage);
 		map.put("lastPage", lastPage);
 		map.put("startPage", startPage);
 		map.put("endPage", endPage);
@@ -107,7 +101,11 @@ public class BoardService {
 		return boardRepository.findByPostInfo(no, userNo);
 	}
 
-	public void deletePost(Long no, Long userNo, String password) {
-		boardRepository.delete(no, userNo, password);
+//	public void deletePost(Long no, Long userNo, String password) {
+//		boardRepository.delete(no, userNo, password);
+//	}
+	
+	public void deletePost(Long no, Long userNo) {
+		boardRepository.delete(no, userNo);
 	}
 }

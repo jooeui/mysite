@@ -35,16 +35,14 @@
 					
 					<c:forEach items='${map.printList }' var='vo' varStatus='status'>
 						<tr>
-							<td>${map.count-(map.limitCount*(map.currentPage-1)) - status.index }</td>
+							<td>${map.count-(map.limitCount*(map.cp-1)) - status.index }</td>
 							<c:choose>
 								<c:when test="${vo.deleteFlag eq 'N' }">
 									<td style="text-align: left; padding-left: ${20*vo.depth}px">
 									<c:if test="${vo.depth > 0 }">
-										<a href="${pageContext.servletContext.contextPath }/board/delete/${vo.no}">
-											<img src="${pageContext.servletContext.contextPath }/assets/images/reply.png">
-										</a>
+										<img src="${pageContext.servletContext.contextPath }/assets/images/reply.png">
 									</c:if>
-									<a href="${pageContext.servletContext.contextPath }/board/view/${vo.no}">
+									<a href="${pageContext.servletContext.contextPath }/board/view/${vo.no}?cp=${map.cp }">
 										${vo.title }
 									</a>
 									</td>
@@ -53,7 +51,7 @@
 									<td>${vo.regDate }</td>
 									<td>
 										<c:if test="${authUser.no == vo.userNo }" >
-											<a href="${pageContext.servletContext.contextPath }/board/delete/${vo.no}" class="del"></a>
+											<a href="${pageContext.servletContext.contextPath }/board/delete/${vo.no}?cp=${map.cp }" class="del"></a>
 										</c:if>
 									</td>
 								</c:when>
@@ -74,33 +72,39 @@
 					</c:forEach>
 				</table>
 				
-				
-				<c:set var="kwdParam" value="&st=${map.st}&kwd=${map.kwd}" />
+				<c:choose>
+					<c:when test='${map.kwd eq "" }'>
+						<c:set var="kwdParam" value="" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="kwdParam" value="&st=${map.st}&kwd=${map.kwd}" />
+					</c:otherwise>
+				</c:choose>
 				<!-- pager 추가 -->
 				<div class="pager">
 					<ul>
 						<%-- 이전 페이지 번호로 이동
 								만약 현재 페이지가 1이라면 이전 페이지 이동 화살표 안 뜨게 --%>
 						<c:choose>
-							<c:when test="${map.currentPage == 1 }">
+							<c:when test="${map.cp == 1 }">
 								<li>◀</li>
 							</c:when>
 							<c:otherwise>
-								<li><a href="${pageContext.servletContext.contextPath }/board?cp=${map.currentPage-1 }">◀</a></li>
+								<li><a href="${pageContext.servletContext.contextPath }/board?cp=${map.cp-1 }">◀</a></li>
 							</c:otherwise>
 						</c:choose>
 						
 						<%-- 페이징 번호 출력 --%>
 						<c:forEach begin="${map.startPage }" end="${map.endPage }" var="pager" step="1">
 							<c:choose>
-								<c:when test="${map.currentPage == pager }">
+								<c:when test="${map.cp == pager }">
 									<li class="selected">${pager }</li>
 								</c:when>
 								<c:when test="${pager > map.lastPage }">
 									<li>${pager }</li>
 								</c:when>
 								<c:otherwise>
-									<li><a href="${pageContext.servletContext.contextPath }/board?cp=${pager }&st=${map.st}&kwd=${map.kwd}">${pager }</a></li>
+									<li><a href="${pageContext.servletContext.contextPath }/board?cp=${pager }${kwdParam }">${pager }</a></li>
 								</c:otherwise>
 							</c:choose>
 						</c:forEach>
@@ -108,8 +112,8 @@
 						<%-- 다음 페이지 번호로 이동
 								만약 현재 페이지가 마지막 페이지(lastPage)라면 다음 페이지 이동 화살표 안 뜨게 --%>
 						<c:choose>
-							<c:when test="${map.currentPage != map.lastPage }">
-								<li><a href="${pageContext.servletContext.contextPath }/board?cp=${map.currentPage+1 }&st=${map.st}&kwd=${map.kwd}">▶</a></li>
+							<c:when test="${map.cp != map.lastPage }">
+								<li><a href="${pageContext.servletContext.contextPath }/board?cp=${map.cp+1 }${kwdParam }">▶</a></li>
 							</c:when>
 							<c:otherwise>
 								<li>▶</li>

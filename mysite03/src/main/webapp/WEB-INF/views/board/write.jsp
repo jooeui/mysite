@@ -16,7 +16,7 @@
 			<div id="board">
 				<c:choose>
 					<c:when test="${not empty no }">
-						<c:set var="writePath" value="/${no }" />
+						<c:set var="writePath" value="/${no }?cp=${cp }" />
 					</c:when>
 					<c:otherwise>
 						<c:set var="writePath" value="" />
@@ -60,7 +60,14 @@
 						</c:when>
 					</c:choose>
 					<div class="bottom">
-						<a href="${pageContext.servletContext.contextPath }/board">취소</a>
+						<c:choose>
+							<c:when test="${empty no }">
+								<a href="${pageContext.servletContext.contextPath }/board">취소</a>
+							</c:when>
+							<c:otherwise>
+								<a href="${pageContext.servletContext.contextPath }/board/view/${no }?cp=${cp }">취소</a>
+							</c:otherwise>
+						</c:choose>
 						<input type="submit" value="등록">
 					</div>
 				</form>				

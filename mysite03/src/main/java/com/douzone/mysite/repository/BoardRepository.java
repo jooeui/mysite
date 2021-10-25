@@ -71,15 +71,25 @@ public class BoardRepository {
 		return count == 1;
 	}
 
-	public boolean delete(Long no, Long userNo, String password) {
+//	public boolean delete(Long no, Long userNo, String password) {
+//		Map<String, Object> map = new HashMap<>();
+//		map.put("no", no);
+//		map.put("userNo", userNo);
+//		map.put("password", password);
+//		
+//		int count = sqlSession.delete("board.deletePost", map);
+//		return count == 1;
+//			
+//	}
+	public boolean delete(Long no, Long userNo) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("no", no);
 		map.put("userNo", userNo);
-		map.put("password", password);
+//		map.put("password", password);
 		
 		int count = sqlSession.delete("board.deletePost", map);
 		return count == 1;
-			
+		
 	}
 
 //	public Long searchCount(String kwd) {

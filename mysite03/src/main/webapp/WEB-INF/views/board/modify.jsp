@@ -14,7 +14,7 @@
 		<c:import url="/WEB-INF/views/includes/header.jsp" />
 		<div id="content">
 			<div id="board">
-				<form class="board-form" method="post" action="${pageContext.servletContext.contextPath }/board/modify/${no}">
+				<form class="board-form" method="post" action="${pageContext.servletContext.contextPath }/board/modify/${no}?cp=${cp }">
 					<table class="tbl-ex">
 						<tr>
 							<th colspan="2">글수정</th>
@@ -43,7 +43,7 @@
 						</c:when>
 					</c:choose>
 					<div class="bottom">
-						<a href="${pageContext.servletContext.contextPath }/board/view/${no}">취소</a>
+						<a href="${pageContext.servletContext.contextPath }/board/view/${no}?cp=${cp }">취소</a>
 						<input type="submit" value="수정">
 					</div>
 				</form>				

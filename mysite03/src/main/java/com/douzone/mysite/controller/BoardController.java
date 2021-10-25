@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,13 +44,11 @@ public class BoardController {
 	@RequestMapping(value="/view/{no}", method=RequestMethod.GET)
 	public String view(
 			@PathVariable("no") Long no,
+			@RequestParam(value="cp", required=true, defaultValue="1") Long currentPage,
 			@CookieValue(value="viewedPosts", required=false) Cookie cookie,
 			HttpServletResponse response,
 			Model model) {
 		BoardVo boardVo = boardService.getPost(no);
-		if(boardVo == null) {
-			return "redirect:/board";
-		}
 		
 		/* 쿠키 */
 		Calendar calendar = Calendar.getInstance();		// 오늘 날짜를 불러오기 위해 calendar 사용
@@ -79,6 +76,7 @@ public class BoardController {
 		}
 		
 		model.addAttribute("boardVo", boardVo);
+		model.addAttribute("cp", currentPage);
 		
 		return "board/view";
 	}
@@ -99,20 +97,27 @@ public class BoardController {
 	/* 게시글 쓰기 */
 	@Auth
 	@RequestMapping(value={"/write", "/write/{no}"}, method=RequestMethod.GET)
-	public String write(@PathVariable(value="no", required=false) Long no, Model model) {
+	public String write(
+			@PathVariable(value="no", required=false) Long no, 
+			@RequestParam(value="cp", required=true, defaultValue="1") Long currentPage,
+			Model model) {
 		if(no != null) {
-			BoardVo parentsBoardInfo = boardService.getParentBoardInfo(no);
-			if(parentsBoardInfo == null) {
-				return "redirect:/board";
-			}
+//			BoardVo parentsBoardInfo = boardService.getParentBoardInfo(no);
+//			if(parentsBoardInfo == null) {
+//				return "redirect:/board";
+//			}
 			model.addAttribute("no", no);
+			model.addAttribute("cp", currentPage);
 		}
 		return "board/write";
 	}
 	
 	@Auth
 	@RequestMapping(value={"/write", "/write/{no}"}, method=RequestMethod.POST)
-	public String write(@AuthUser UserVo authUser, BoardVo boardVo, Model model) {
+	public String write(
+			@AuthUser UserVo authUser, BoardVo boardVo, 
+			@RequestParam(value="cp", required=true, defaultValue="1") Long currentPage,
+			Model model) {
 		// 제목이나 내용을 입력하지 않을 경우 작성 되지 않는다
 		if("".equals(boardVo.getTitle())) {
 			model.addAttribute("boardVo", boardVo);
@@ -127,25 +132,30 @@ public class BoardController {
 		
 		Long postNo = boardService.addPost(boardVo);	// 게시글 작성 후 작성된 게시글의 번호를 받아옴
 		
-		return "redirect:/board/view/" + postNo;
+		return "redirect:/board/view/" + postNo + "?cp=" + currentPage;
 	}
 	
+	/* 게시글 수정 */
 	@Auth
 	@RequestMapping(value="/modify/{no}", method=RequestMethod.GET)
 	public String modify(
-			@PathVariable("no") Long no, @AuthUser UserVo authUser, Model model) {
+			@PathVariable("no") Long no,
+			@RequestParam(value="cp", required=true, defaultValue="1") Long currentPage,
+			@AuthUser UserVo authUser, Model model) {
 		BoardVo editPostInfo = boardService.getEditPostInfo(no, authUser.getNo());
-		if(editPostInfo == null) {
-			return "redirect:/board";
-		}
-		
+//		if(editPostInfo == null) {
+//			return "redirect:/board";
+//		}
 		model.addAttribute(editPostInfo);
+		model.addAttribute("cp", currentPage);
 		return "board/modify";
 	}
 	
 	@Auth
 	@RequestMapping(value="/modify/{no}", method=RequestMethod.POST)
-	public String modify(@AuthUser UserVo authUser, BoardVo boardVo, Model model) {
+	public String modify(
+			@RequestParam(value="cp", required=true, defaultValue="1") Long currentPage,
+			@AuthUser UserVo authUser, BoardVo boardVo, Model model) {
 		if("".equals(boardVo.getTitle())) {
 			model.addAttribute("boardVo", boardVo);
 			model.addAttribute("result", "emptyTitle");
@@ -159,29 +169,31 @@ public class BoardController {
 		
 		boardService.editPost(boardVo);
 		
-		return "redirect:/board/view/" + boardVo.getNo();
+		return "redirect:/board/view/" + boardVo.getNo() + "?cp=" + currentPage;
 	}
 	
+	/* 글 삭제 */
+//	@Auth
+//	@RequestMapping(value="/delete/{no}", method=RequestMethod.GET)
+//	public String delete(
+//			@PathVariable("no") Long no, 
+//			@RequestParam(value="cp", required=true, defaultValue="1") Long currentPage,
+//			Model model) {
+//		model.addAttribute("no", no);
+//		return "/board/delete";
+//	}
+	
 	@Auth
+//	@RequestMapping(value="/delete/{no}", method=RequestMethod.POST)
 	@RequestMapping(value="/delete/{no}", method=RequestMethod.GET)
 	public String delete(
-			@PathVariable("no") Long no, @AuthUser UserVo authUser, Model model) {
-		BoardVo deletePostInfo = boardService.getDeletePostInfo(no, authUser.getNo());
-		if(deletePostInfo == null) {
-			return "redirect:/board";
-		}
-		model.addAttribute("no", no);
-		return "/board/delete";
-	}
-	
-	@Auth
-	@RequestMapping(value="/delete/{no}", method=RequestMethod.POST)
-	public String delete(
 			@PathVariable("no") Long no,
-			@RequestParam(value="password", required=true, defaultValue="") String password,
+			@RequestParam(value="cp", required=true, defaultValue="1") Long currentPage,
+//			@RequestParam(value="password", required=true, defaultValue="") String password,
 			@AuthUser UserVo authUser) {
-		boardService.deletePost(no, authUser.getNo(), password);
+//		boardService.deletePost(no, authUser.getNo(), password);
+		boardService.deletePost(no, authUser.getNo());
 		
-		return "redirect:/board";
+		return "redirect:/board?cp=" + currentPage;
 	}
 }

@@ -33,12 +33,12 @@
 					</tr>
 				</table>
 				<div class="bottom">
-					<a href="${pageContext.servletContext.contextPath }/board">글목록</a>
+					<a href="${pageContext.servletContext.contextPath }/board?cp=${cp }">글목록</a>
 					<c:if test='${authUser.no == boardVo.userNo }'>
-						<a href="${pageContext.servletContext.contextPath }/board/delete/${boardVo.no }">글삭제</a>
-						<a href="${pageContext.servletContext.contextPath }/board/modify/${boardVo.no }">글수정</a>
+						<a href="${pageContext.servletContext.contextPath }/board/delete/${boardVo.no }?cp=${cp }">글삭제</a>
+						<a href="${pageContext.servletContext.contextPath }/board/modify/${boardVo.no }?cp=${cp }">글수정</a>
 					</c:if>
-					<a href="${pageContext.servletContext.contextPath }/board/write/${boardVo.no }">답글</a>
+					<a href="${pageContext.servletContext.contextPath }/board/write/${boardVo.no }?cp=${cp }">답글</a>
 				</div>
 			</div>
 		</div>
