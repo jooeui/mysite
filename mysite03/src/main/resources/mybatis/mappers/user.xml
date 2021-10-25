@@ -3,9 +3,37 @@
 
 <mapper namespace="user">
 	<update id="update" parameterType="uservo" >
-		<![CDATA[
-		update user set name=#{name }, gender=#{gender } where no=#{no }
-		]]>
+	<choose>
+		<when test='name == null || name == ""'>
+			<choose>
+				<when test='password == null || password == ""'>
+					<![CDATA[
+					update user set gender=#{gender } where no=#{no }
+					]]>
+				</when>
+				<otherwise>
+					<![CDATA[
+					update user set password=#{password }, gender=#{gender } where no=#{no }
+					]]>
+				</otherwise>
+			</choose>
+		</when>
+		<otherwise>
+			<choose>
+				<when test='password == null || password == ""'>
+					<![CDATA[
+					update user set name=#{name }, gender=#{gender } where no=#{no }
+					]]>
+				</when>
+				<otherwise>
+					<![CDATA[
+					update user set name=#{name }, password=#{password }, gender=#{gender } where no=#{no }
+					]]>
+				</otherwise>
+			</choose>
+		</otherwise>
+	</choose>
+		
 	</update>
 
 	<insert id="insert" parameterType="uservo" >

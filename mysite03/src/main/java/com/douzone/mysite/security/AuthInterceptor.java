@@ -16,7 +16,9 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 			throws Exception {
 		
 		// 1. handler 종류 확인
+		// 받아온 handler가 HandlerMethod 타입인지 체크(Controller에 있는 메서드)
 		if(handler instanceof HandlerMethod == false) {
+			// 없으면 그대로 진행
 			return true;
 		}
 		
@@ -29,10 +31,11 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 		// 4. Handler Method에 @Auth가 없으면 Type에 있는지 확인
 		if(auth == null) {
 			// 과제
-//			auth = handlerMethod
+			auth = handlerMethod.getMethod().getDeclaringClass().getAnnotation(Auth.class);
 		}
 		
 		// 5. Type과 Method에 @Auth가 적용이 안 되어 있는 경우
+		// 인증이 필요 없는 요청
 		if(auth == null) {
 			return true;
 		}
@@ -54,7 +57,19 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 		
 		// 8. 권한 체크
 		// 		과제....................................................
+		// 8-1. @Auth의 role이 USER인 경우, authUser의 role 상관 x
+		if("USER".equals(role)) {
+			return true;
+		}
 		
+		// 8-2. @Auth의 role이 ADMIN인 경우, authUser의 role이 ADMIN이어야 함
+		// authUser의 role이 ADMIN이 아닐 경우 권한 xxxxxx false 반환!!
+		if("ADMIN".equals(authUser.getRole()) == false) {
+			response.sendRedirect(request.getContextPath());
+			return false;
+		}
+		
+		// @Auth의 role이 ADMIN이고 authUser의 role이 ADMIN이면 true 반환!!!!
 		return true;
 	}
 

@@ -45,6 +45,7 @@
 
 	<!-- mvc url-resource mapping -->
 	<mvc:resources mapping="/gallery/images/**" location="file:/upload-mysite/" />
+	<mvc:resources mapping="/mysite/images/**" location="file:/upload-mysite/profile/" />
 
 	<!-- Interceptors -->
 	<mvc:interceptors>
