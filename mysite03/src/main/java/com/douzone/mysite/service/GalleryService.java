@@ -34,7 +34,7 @@ public class GalleryService {
 	public void uploadImage(MultipartFile multipartFile, String comments) {
 		try {
 			File uploadDirectory = new File(SAVE_PATH);
-			if(uploadDirectory.exists()) {
+			if(!uploadDirectory.exists()) {
 				uploadDirectory.mkdir();
 			}
 			
