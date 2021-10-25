@@ -19,7 +19,7 @@ public class JsonResult {
 	public static JsonResult success(Object data) {
 		return new JsonResult(data);
 	}
-	public static JsonResult success(String message) {
+	public static JsonResult fail(String message) {
 		return new JsonResult(message);
 	}
 	

@@ -14,8 +14,6 @@ import com.douzone.mysite.vo.UserVo;
 
 @Repository
 public class UserRepository {
-	@Autowired
-	private DataSource dataSource;
 	
 	@Autowired
 	private SqlSession sqlSession;
