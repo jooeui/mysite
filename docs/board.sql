@@ -105,6 +105,7 @@ where b.user_no = u.no
 					where b1.group_no = b2.group_no
 						and b2.group_no = b3.group_no
 						and b2.count = b3.count)
+	and name like '%주의%'
 order by b.group_no desc, b.order_no asc;
 select count(*) from board;
 select count(*) from board
@@ -116,7 +117,8 @@ where no not in (select b.no
 						where b.group_no = b2.group_no
 							and order_no = 0
 							and delete_flag = 'Y'
-							and b2.count = 1);
+							and b2.count = 1)
+		and title like '%%';
 
 -- select b.no, b.title, b.hit, 
 -- 		if(curdate()=date_format(reg_date, '%Y-%m-%d'), date_format(reg_date, '%H:%i'), date_format(reg_date, '%Y.%m.%d.')) as reg_date, 
