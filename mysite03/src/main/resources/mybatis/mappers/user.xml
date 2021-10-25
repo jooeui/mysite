@@ -15,6 +15,22 @@
 		]]>
 	</insert>
 	
+	<select id="findByNo" parameterType="long" resultType="uservo">
+		<![CDATA[
+		select no, name, email, gender 
+		from user 
+		where no=#{no }
+		]]>
+	</select>
+	
+	<select id="findByEmail" parameterType="string" resultType="uservo">
+		<![CDATA[
+		select no 
+		from user 
+		where email = #{email }
+		]]>
+	</select>
+	
 	<select id="findByEmailAndPassword" parameterType="map" resultType="uservo">
 		<![CDATA[
 		select no, name, role
@@ -23,12 +39,5 @@
 		]]>
 	</select>
 	
-	<select id="findByNo" parameterType="long" resultType="uservo">
-		<![CDATA[
-		select no, name, email, gender 
-		from user 
-		where no=#{no }
-		]]>
-	</select>
 
 </mapper>

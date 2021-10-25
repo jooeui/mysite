@@ -74,6 +74,8 @@
 					</c:forEach>
 				</table>
 				
+				
+				<c:set var="kwdParam" value="&st=${map.st}&kwd=${map.kwd}" />
 				<!-- pager 추가 -->
 				<div class="pager">
 					<ul>
@@ -84,7 +86,7 @@
 								<li>◀</li>
 							</c:when>
 							<c:otherwise>
-								<li><a href="${pageContext.servletContext.contextPath }/board?cp=${map.currentPage-1 }&st=${map.st}&kwd=${map.kwd}">◀</a></li>
+								<li><a href="${pageContext.servletContext.contextPath }/board?cp=${map.currentPage-1 }">◀</a></li>
 							</c:otherwise>
 						</c:choose>
 						

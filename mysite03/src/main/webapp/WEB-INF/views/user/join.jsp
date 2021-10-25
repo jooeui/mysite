@@ -8,6 +8,74 @@
 <title>mysite</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <link href="${pageContext.request.contextPath }/assets/css/user.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="${pageContext.request.contextPath }/assets/js/jquery/jquery-1.9.0.js"></script>
+<script>
+window.onload = function(){
+	// console.log("loaded!!!!!!!!!");	
+	// btnCheckEmail = $("#btn-check-email");
+	$("#btn-check-email").click(function(){
+		// console.log("click");
+		
+		// var는 해당 블럭 안에서만 사용
+		var email = $("#email").val();
+		if(email == ''){
+			return;
+		}
+		console.log(email);
+		
+		$.ajax({
+			url: "${pageContext.request.contextPath }/user/api/checkemail?email=" + email,
+			type: "get",
+			dataType: "json",
+			success: function(response) {
+				console.log(response);
+				
+				if(response.exist){
+					alert("이미 존재하는 이메일입니다. 다른 이메일을 사용하세요.");
+					$("#email")
+						.val("")
+						.focus();
+					return;
+				}
+			}
+		})
+	});
+};
+
+</script>
+<%--
+<script>
+// jQuery = function() {}
+// $ = jQuery;
+
+setTimeout(function() {
+	// jQuery
+	//e = $("#test");
+	//e.html("<strong>Hello World</strong>");
+	
+	// javascript
+	// e = document.getElementById("test");
+	// e.innerHTML = "<strong>Hello World</strong>";
+	
+	// ajax
+	$.ajax({
+		url: "/mysite03/msg02",
+		type: "get",
+		dataType: "json",
+		success: function(response) {
+			console.log(response);
+			p = $("#test");
+			p.html("<strong>" + response.message + "</strong>");
+		}
+	});
+	
+}, 3000);
+
+for(i=0; i<5; i++){
+	console.log("Hello World: " + i);
+}
+</script>
+ --%>
 </head>
 <body>
 	<div id="container">
@@ -21,7 +89,7 @@
 
 					<label class="block-label" for="email">이메일</label>
 					<input id="email" name="email" type="text" value="">
-					<input type="button" value="id 중복체크">
+					<input id="btn-check-email" type="button" value="id 중복체크">
 					
 					<label class="block-label">패스워드</label>
 					<input name="password" type="password" value="">
@@ -43,6 +111,7 @@
 				</form>
 			</div>
 		</div>
+		<p id="test"></p>
 		<c:import url="/WEB-INF/views/includes/navigation.jsp" />
 		<c:import url="/WEB-INF/views/includes/footer.jsp" />
 	</div>

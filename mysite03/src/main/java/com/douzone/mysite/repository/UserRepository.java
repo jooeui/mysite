@@ -25,6 +25,14 @@ public class UserRepository {
 		return count == 1;
 	}
 	
+	public UserVo findByNo(Long no) throws UserRepositoryException {
+		return sqlSession.selectOne("user.findByNo", no);
+	}
+	
+	public UserVo findByEmail(String email) {
+		return sqlSession.selectOne("user.findByEmail", email);
+	}
+	
 	public UserVo findByEmailAndPassword(String email, String password) throws UserRepositoryException {
 		Map<String, String> map = new HashMap<>();
 		map.put("e", email);
@@ -32,10 +40,6 @@ public class UserRepository {
 		
 		UserVo vo = sqlSession.selectOne("user.findByEmailAndPassword", map);
 		return vo;
-	}
-
-	public UserVo findByNo(Long no) throws UserRepositoryException {
-		return sqlSession.selectOne("user.findByNo", no);
 	}
 
 	public boolean update(UserVo vo) {
