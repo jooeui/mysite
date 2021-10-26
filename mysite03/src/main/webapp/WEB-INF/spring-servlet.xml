@@ -44,13 +44,14 @@
 	<mvc:default-servlet-handler />
 
 	<!-- mvc url-resource mapping -->
-	<mvc:resources mapping="/gallery/images/**"
-		location="file:/upload-mysite/" />
-	<mvc:resources mapping="/mysite/images/**"
-		location="file:/upload-mysite/profile/" />
+	<mvc:resources mapping="/upload/images/**" location="file:/upload-mysite/" />
 
 	<!-- Interceptors -->
 	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="com.douzone.mysite.security.SiteInterceptor" />
+		</mvc:interceptor>
 		<mvc:interceptor>
 			<mvc:mapping path="/user/auth" />
 			<bean class="com.douzone.mysite.security.LoginInterceptor" />

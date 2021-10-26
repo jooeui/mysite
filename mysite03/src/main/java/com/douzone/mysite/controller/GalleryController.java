@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.douzone.mysite.security.Auth;
+import com.douzone.mysite.service.FileUploadService;
 import com.douzone.mysite.service.GalleryService;
 import com.douzone.mysite.vo.GalleryVo;
 
@@ -20,6 +21,9 @@ import com.douzone.mysite.vo.GalleryVo;
 public class GalleryController {
 	@Autowired
 	private GalleryService galleryService;
+	
+	@Autowired
+	private FileUploadService fileUploadService;
 	
 	@RequestMapping("")
 	public String index(Model model) {
@@ -34,7 +38,15 @@ public class GalleryController {
 	public String upload(
 			@RequestParam(value="file") MultipartFile multipartFile,
 			@RequestParam(value="comments", required=true, defaultValue="") String comments) {
-		galleryService.uploadImage(multipartFile, comments);
+//		galleryService.uploadImage(multipartFile, comments);
+		String url = fileUploadService.uploadFile(multipartFile);
+		
+		GalleryVo vo = new GalleryVo();
+		vo.setUrl(url);
+		vo.setComments(comments);
+		
+		galleryService.uploadImage(vo);
+		
 		return "redirect:/gallery";
 	}
 	

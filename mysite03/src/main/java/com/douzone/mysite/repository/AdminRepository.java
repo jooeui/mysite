@@ -15,9 +15,8 @@ public class AdminRepository {
 		return sqlSession.selectOne("admin.getSiteInfo");
 	}
 
-	public boolean updateSiteInfo(SiteVo siteVo) {
-//		System.out.println("repository----------------------\n" + siteVo);
-		int count = sqlSession.update("admin.updateSiteInfo", siteVo);
+	public boolean updateSite(SiteVo siteVo) {
+		int count = sqlSession.update("admin.updateSite", siteVo);
 		return count == 1;
 	}
 	

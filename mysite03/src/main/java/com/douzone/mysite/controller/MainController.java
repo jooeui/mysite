@@ -3,26 +3,31 @@ package com.douzone.mysite.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.douzone.mysite.security.Auth;
-import com.douzone.mysite.service.AdminService;
-import com.douzone.mysite.vo.SiteVo;
 
 @Controller
 public class MainController {
-	@Autowired
-	private AdminService adminService;
+//	@Autowired
+//	private AdminService adminService;
 	
 	@Auth
 	@RequestMapping({"", "/main"})
 	public String index(Model model) {
-		SiteVo siteVo = adminService.getSiteInfo();
-		model.addAttribute("siteVo", siteVo);
+		// servlet context에 담아서 뿌려주자
+		// 메인 페이지 처음 갔을 때 불러옴
+		// 이것도 Interceptor 만들어서...?
+//		SiteVo site = servletContext.getAttribute("site");
+//		if(site == null) {
+//			SiteVo siteVo = adminService.getSiteInfo();
+//			servletContext.setAttribute("siteVo", siteVo);
+//		}
+//		SiteVo siteVo = adminService.getSiteInfo();
+//		model.addAttribute("siteVo", siteVo);
 		return "main/index";
 	}
 	
