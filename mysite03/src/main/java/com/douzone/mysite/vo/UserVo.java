@@ -15,12 +15,12 @@ public class UserVo {
 	@NotEmpty
 	@Email
 	private String email;
-	private String password;
 	
 	@NotEmpty
 	@Length(min=4, max=16)
-	private String gender;
+	private String password;
 	
+	private String gender;
 	private String joinDate;
 	private String role;
 	
