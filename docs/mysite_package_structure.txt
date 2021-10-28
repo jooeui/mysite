@@ -1,0 +1,52 @@
+[src]
+  | --- [main]
+  	| --- [java]
+	|         | --- com
+	|         |	      | --- dozone
+	|         |	      |          | --- config
+	|         |	      |          |         | --- app
+	|         |	      |          |         |        | --- DBConfig.java
+	|         |	      |          |         |        | --- MyBatisConfig.java
+	|         |	      |          |         | --- web
+	|         |	      |          |         |        | --- MvcConfig.java
+	|         |	      |          |         |        | --- SecurityConfig.java
+	|         |	      |          |         |        | --- MessageConfig.java
+	|         |	      |          |         |        | --- FileuploadConfig.java
+	|         |	      |          |         |
+	|         |	      |          | --- mysite
+	|         |	      |          |         |--- controller
+	|         |	      |          |         |--- service
+	|         |	      |          |         |--- repository
+	|         |	      |          |         |--- vo
+	|         |	      |          |         |--- exception
+	|         |	      |          |         |--- aop
+	|         |	      |          |         |--- config(04에서 추가)
+	|         |	      |          |         |        | --- AppConfig.java (applicationContext.xml 대체)
+	|         |	      |          |         |        | --- WebConfig.java (spring-servlet.xml 대체)
+  	| --- [resources]
+	|         | --- logback.xml
+	|         | --- com
+	|         |	      | --- dozone
+	|         |	      |          | --- mysite
+	|         |	      |          |         | --- config
+	|         |	      |          |         |        | --- app
+	|         |	      |          |         |        |        | --- jdbc.properties
+	|         |	      |          |         |        |        | --- mybatis
+	|         |	      |          |         |        |        |	 | --- configuration.xml
+	|         |	      |          |         |        |        |	 | --- mappers
+	|         |	      |          |         |        |        |	 |          | --- board.xml
+	|         |	      |          |         |        |        |	 |          | --- user.xml
+	|         |	      |          |         |        | --- web
+	|         |	      |          |         |        |        | --- message_ko.properties
+	|         |	      |          |         |        |        | --- fileupload.properties
+
+
+
+
+
+
+
+
+
+
+
