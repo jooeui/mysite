@@ -1,15 +1,11 @@
 package com.douzone.mysite.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -60,11 +56,6 @@ public class UserController {
 		return "user/login";
 	}
 	
-	@RequestMapping(value="/logout", method=RequestMethod.GET)
-	public String logout() {
-		return "redirect:/";
-	}
-	
 	@Auth	// 접근 여부는 얘가 판단
 	@RequestMapping(value="/update", method=RequestMethod.GET)
 //	public String update(@AuthUser("no") Long no, Model model) {
@@ -84,5 +75,13 @@ public class UserController {
 		authUser.setName(userVo.getName());
 		
 		return "redirect:/user/update";
+	}
+	
+	@RequestMapping(value="/auth", method=RequestMethod.POST)
+	public void auth() {
+	}
+	
+	@RequestMapping(value="/logout", method=RequestMethod.GET)
+	public void logout() {
 	}
 }

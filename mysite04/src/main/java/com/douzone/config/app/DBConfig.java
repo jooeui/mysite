@@ -24,8 +24,8 @@ public class DBConfig {
 		dataSource.setUrl(env.getProperty("jdbc.url"));
 		dataSource.setUsername(env.getProperty("jdbc.username"));
 		dataSource.setPassword(env.getProperty("jdbc.password"));
-//		dataSource.setInitialSize(env.getProperty("jdbc.initialSize"), Integer.class);	// connection Pool을 몇 개 줄 것인가!!
-//		dataSource.setMaxActive(env.getProperty("jdbc.maxActive"), Integer.class);
+		dataSource.setInitialSize(env.getProperty("jdbc.initialSize", Integer.class));	// connection Pool을 몇 개 줄 것인가!!
+		dataSource.setMaxActive(env.getProperty("jdbc.maxActive", Integer.class));
 		
 		return dataSource;
 	}
