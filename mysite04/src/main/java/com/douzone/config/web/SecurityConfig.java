@@ -9,11 +9,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.douzone.mysite.interceptor.SiteInterceptor;
 import com.douzone.mysite.security.AuthInterceptor;
 import com.douzone.mysite.security.AuthUserHandlerMethodArgumentResolver;
 import com.douzone.mysite.security.LoginInterceptor;
 import com.douzone.mysite.security.LogoutInterceptor;
-import com.douzone.mysite.security.SiteInterceptor;
 
 @Configuration
 public class SecurityConfig extends WebMvcConfigurerAdapter {

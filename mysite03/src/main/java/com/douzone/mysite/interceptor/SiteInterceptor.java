@@ -1,4 +1,4 @@
-package com.douzone.mysite.security;
+package com.douzone.mysite.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
