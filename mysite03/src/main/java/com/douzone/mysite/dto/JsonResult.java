@@ -12,7 +12,7 @@ public class JsonResult {
 		message = null;
 	}
 	private JsonResult(String message) {
-		result = "success";
+		result = "fail";
 		data = null;
 		this.message = message;
 	}
