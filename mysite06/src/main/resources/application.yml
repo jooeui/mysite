@@ -1,12 +1,14 @@
 # active spring boot profile
 spring:
-   profile:
+   profiles:
+      # default: dev
       active: dev
 
 ---
+
 # common - spring configuration
 spring:
-   # devtools - 
+   # devtools - live reload
    devtools:
       livereload:
          enabled: true
@@ -17,18 +19,9 @@ spring:
          prefix: /WEB-INF/views/
          suffix: .jsp
 
-   # http
-   http:
-      encoding:
-         charset: utf-8
-         enabled: true
-         forced: false
-         forced-request: false
-         forced-response: false
-
    # message resource(Internationalization)
    messages:
-      always-message-format: true
+      always-user-message-format: true
       basename: messages/messages_ko
       encoding: utf-8
 
@@ -45,45 +38,65 @@ spring:
       proxy-target-class: true
 
 ---
-# production profile - spring boot configuration
-spring:
-   profile: production
-   # datasource
-   datasource:
-      driver-class-name: org.mariadb.jdbc.Driver
-      url: jdbc:mysql://222.3.4.5:3306/webdb?characterEncoding=utf8?
-      username: pikaaaaaaa
-      password: pikaaaaachuuuuuuuuuu@@
-      initialSize: 10
-      maxActive: 20
 
----
 # dev profile - spring boot configuration
 spring:
-   profile: dev
+   config:
+      active:
+         on-profile: dev
 
    # datasource
    datasource:
-      driver-class-name: org.mariadb.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/webdb?characterEncoding=utf8?
       username: webdb
       password: webdb
-      initialSize: 10
-      maxActive: 20
+      driver-class-name: org.mariadb.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/webdb?characterEncoding=utf8
+      hikari:
+         minimum-idle: 10
+         maximum-pool-size: 20
 
 ---
+
+# production profile - spring boot configuration
+spring:
+   config:
+      active:
+         on-profile: production
+   # datasource
+   datasource:
+      username: webdb
+      password: pikaaaaachuuuuuuuuuu@@
+      driver-class-name: org.mariadb.jdbc.Driver
+      url: jdbc:mysql://222.3.4.5:3306/webdb?characterEncoding=utf8
+      hikari:
+         minimum-idle: 100
+         maximum-pool-size: 200
+
+---
+
 # server
 server:
    port: 8080
    servlet:
       context-path: /mysite06
+   encoding:
+      charset: utf-8
+      enabed: true
+      force: false
+      force-request: false
+      force-response: false
 
 ---
+---
+---
+---
+
 # mybatis
 mybatis:
    config-location: classpath:mybatis/configuration.xml
 
 ---
+
 # logging
 logging:
    config: classpath:logback.xml
