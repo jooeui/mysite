@@ -42,7 +42,7 @@ spring:
 # dev profile - spring boot configuration
 spring:
    config:
-      active:
+      activate:
          on-profile: dev
 
    # datasource
@@ -60,8 +60,9 @@ spring:
 # production profile - spring boot configuration
 spring:
    config:
-      active:
+      activate:
          on-profile: production
+
    # datasource
    datasource:
       username: webdb
@@ -86,9 +87,6 @@ server:
       force-request: false
       force-response: false
 
----
----
----
 ---
 
 # mybatis
