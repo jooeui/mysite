@@ -16,13 +16,20 @@ public class GuestbookService {
 	public List<GuestbookVo> guestbookList() {
 		return guestbookRepository.findAll();
 	}
+	
+	public List<GuestbookVo> findAll(Long no) {
+		return guestbookRepository.findAllLimit(no);
+	}
 
 	public void write(GuestbookVo vo) {
 		guestbookRepository.insert(vo);
 	}
-
-	public void delete(GuestbookVo vo) {
-		guestbookRepository.delete(vo);
-	}
 	
+	public boolean delete(Long no, String password) {
+		if(guestbookRepository.findByPassword(no, password) == null) {
+			return false; 
+		}
+		
+		return guestbookRepository.delete(no, password);
+	}
 }

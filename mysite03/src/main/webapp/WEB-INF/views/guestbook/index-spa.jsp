@@ -11,6 +11,180 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script type="text/javascript" src="${pageContext.request.contextPath }/assets/js/jquery/jquery-1.9.0.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/ejs/ejs.js"></script>
+<script>
+var listEJS = new EJS({
+	url: "${pageContext.request.contextPath }/ejs/list-template.ejs"
+});
+var listItemEJS = new EJS({
+	url: "${pageContext.request.contextPath }/ejs/listitem-template.ejs"
+});
+
+
+var messageBox = function(title, message, callback) {
+	$("#dialog-message").attr("title", title);
+	$("#dialog-message p").text(message);
+	$("#dialog-message").dialog({
+		modal: true,
+		buttons: {
+			"확인": function(){
+				$(this).dialog("close");
+			}
+		}, 
+		close: callback
+	});
+}
+
+var startNo;
+
+var fetch = function() {
+	var url = "${pageContext.request.contextPath }/api/guestbook/list" + (startNo ? '?sn='+startNo : '');
+	console.log(url);
+	
+	$.ajax({
+		url: url,
+		dataType: "json",
+		type: "get",
+		success: function(response) {
+			console.log(response);
+			
+			var html = listEJS.render(response);
+			$("#list-guestbook").append(html);
+			
+			startNo = $("#list-guestbook li").last().data("no") || 0;
+			console.log(startNo);
+		}
+	})
+};
+
+$(function() {
+	// form validation
+	$("#add-form").submit(function(){
+		event.preventDefault();
+		var guestbook = {};
+		
+		// 이름
+		guestbook.name = $("#input-name").val();
+		if(!guestbook.name) {
+			messageBox("새글 작성", "이름은 반드시 입력해야 합니다.", function(){
+				$("#input-name").focus();
+			});
+			return;
+		}
+		
+		// 비밀번호
+		guestbook.password = $("#input-password").val();
+		if(!guestbook.password) {
+			messageBox("새글 작성", "비밀번호는 반드시 입력해야 합니다.", function(){
+				$("#input-password").focus();
+			});
+			return;
+		}
+		
+		// 글
+		guestbook.message = $("#tx-content").val();
+		if(!guestbook.message) {
+			messageBox("새글 작성", "내용은 반드시 입력해야 합니다.", function(){
+				$("#input-name").focus();
+			});
+			return;
+		}
+		
+		$.ajax({
+			url: "${pageContext.request.contextPath }/api/guestbook/add",
+			type: "post",
+			dataType: "json",
+			contentType: "application/json",
+			data: JSON.stringify(guestbook),
+			success: function(response){
+				if(response.result !== "success") {
+					console.error(response.message);
+					return;
+				}
+				
+				var html = listItemEJS.render(response.data);
+				$("#list-guestbook").prepend(html);
+				$("#add-form")[0].reset();
+			},
+			error: function(xhr, status, error){
+				console.error(statue + " : " + error);
+			}
+		})
+	});
+	
+	
+	// 삭제
+	var dialogDelete = $("#dialog-delete-form").dialog({
+		autoOpen: false,
+		modal: true,
+		buttons: {
+			"삭제": function(){
+				// ajax 삭제
+				var no = $("#hidden-no").val();
+				var password = $("#password-delete").val();
+				var url = "${pageContext.request.contextPath }/api/guestbook/delete/" + no;
+				
+				$.ajax({
+					url: url,
+					type: "post",
+					dataType: "json",
+					data: "password=" + password,
+					success: function(response){
+						console.log(response);
+						
+						if(response.data == -1){
+							$(".validateTips.error").show();
+							$("#password-delete").val('').focus();
+							
+							return;
+						}
+						
+						// 삭제된 경우
+						$("#list-guestbook li[data-no=" + response.data + "]").remove();
+						$("#password-delete").val('');
+						$(".validateTips.error").hide();
+						dialogDelete.dialog("close");
+					}
+				});
+			},
+			"취소": function(){
+				$("#password-delete").val('');
+				$(".validateTips.error").hide();
+				$(this).dialog("close");
+			}	
+		}
+	});
+	
+	// dialogDelete.dialog("open");
+	
+	// 글 삭제 버튼 (Live Event)
+	$(document).on("click", "#list-guestbook li a", function(event){
+		event.preventDefault();
+		var no = $(this).data("no");
+		$("#hidden-no").val(no);
+		
+		console.log(no);
+		
+		dialogDelete.dialog("open");
+	});
+
+	// 첫번째 리스트 가져오기
+	fetch();
+
+	$(window).scroll(function(){
+		var $window = $(this);
+		var $document = $(document);
+		
+		var windowHeight = $window.height();
+		var documentHeight = $document.height();
+		var scrollTop = $window.scrollTop();
+		
+		if(scrollTop + windowHeight + 10 > documentHeight) {
+			fetch();
+		}
+	});
+});
+</script>
 </head>
 <body>
 	<div id="container">
@@ -25,38 +199,6 @@
 					<input type="submit" value="보내기" />
 				</form>
 				<ul id="list-guestbook">
-
-					<li data-no=''>
-						<strong>지나가다가</strong>
-						<p>
-							별루입니다.<br>
-							비번:1234 -,.-
-						</p>
-						<strong></strong>
-						<a href='' data-no=''>삭제</a> 
-					</li>
-					
-					<li data-no=''>
-						<strong>둘리</strong>
-						<p>
-							안녕하세요<br>
-							홈페이지가 개 굿 입니다.
-						</p>
-						<strong></strong>
-						<a href='' data-no=''>삭제</a> 
-					</li>
-
-					<li data-no=''>
-						<strong>주인</strong>
-						<p>
-							아작스 방명록 입니다.<br>
-							테스트~
-						</p>
-						<strong></strong>
-						<a href='' data-no=''>삭제</a> 
-					</li>
-					
-									
 				</ul>
 			</div>
 			<div id="dialog-delete-form" title="메세지 삭제" style="display:none">
@@ -69,7 +211,7 @@
   				</form>
 			</div>
 			<div id="dialog-message" title="" style="display:none">
-  				<p></p>
+  				<p>이름은 반드시 입력해야 합니다.</p>
 			</div>						
 		</div>
 		<c:import url="/WEB-INF/views/includes/navigation.jsp">

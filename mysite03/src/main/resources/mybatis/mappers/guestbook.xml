@@ -25,18 +25,49 @@
 		</selectKey>
 	</insert>
 
-	<delete id="delete" parameterType="guestbookvo">
+	<delete id="delete" parameterType="map">
 		<![CDATA[
 		delete from guestbook where no=#{no } and password=#{password }
 		]]>
 	</delete>
-
+	
+	<select id="findByPassword" parameterType="map" resultType="guestbookvo">
+		<![CDATA[
+		select no
+		from guestbook
+		where no = #{no } 
+			and password = #{password }
+		]]>
+	</select>
+	
 	<select id="findAll" resultType="guestbookvo">
 		<![CDATA[
 		select no, name, date_format(reg_date, '%Y/%m/%d %H:%i:%s') as regDate, message
 		from guestbook
 		order by reg_date desc
 		]]>
+	</select>
+	
+	<select id="findAllLimit" parameterType="long" resultType="guestbookvo">
+		<choose>
+			<when test="_parameter == -1">
+				<![CDATA[
+				select no, name, date_format(reg_date, '%Y/%m/%d %H:%i:%s') as regDate, message
+				from guestbook
+				order by no desc
+				limit 7
+				]]>
+			</when>
+			<otherwise>
+				<![CDATA[
+				select no, name, date_format(reg_date, '%Y/%m/%d %H:%i:%s') as regDate, message
+				from guestbook
+				where no < #{_parameter }
+				order by no desc
+				limit 7
+				]]>
+			</otherwise>
+		</choose>
 	</select>
 
 </mapper>
